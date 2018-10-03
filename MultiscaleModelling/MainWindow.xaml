@@ -5,8 +5,57 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiscaleModelling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="400" Width="700">
+
+    <Border Padding="10">
+        <StackPanel>
+            <Grid RenderTransformOrigin="0.582,4.753">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- PROPERTIES -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Properties" FontWeight="Bold" Margin="10"></TextBlock>
+                    
+                    <!-- CLASS 1 -->
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Number of grains" />
+                        <TextBox Grid.Column="1" Text="10" x:Name="NumberOfGrainsTextBox" Padding="5"/>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Neighbourhood type"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="NeumannRadioButton" Margin="2" IsChecked="false">Von Neumann</RadioButton>
+                            <RadioButton x:Name="MooreRadioButton" Margin="2" IsChecked="true">Moore</RadioButton>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- CLASS 2 -->
+
+                    
+                    <!-- START -->
+                    <Grid Margin="15">
+                        <Button x:Name="StartButton" Click="StartButton_Click" Width="120" Height="20">Start simulation</Button>
+                    </Grid>
+
+                </StackPanel>
+
+                <!-- IMAGE -->
+                <StackPanel Grid.Column="1">
+                    <Image x:Name="StructureImage" Height="302" Width="302" Margin="10"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+    </Border>
 </Window>

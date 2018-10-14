@@ -3,20 +3,69 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiscaleModelling.Common
 {
     public static class StructureHelpers
     {
+        public static void UpdateBitmap(Scope scope)
+        {
+            if (scope != null)
+            {
+                scope.StructureBitmap = new Bitmap(scope.Width, scope.Height);
+
+                if (scope.StructureArray != null)
+                {
+                    for (int i = 0; i < scope.Width; i++)
+                    {
+                        for (int j = 0; j < scope.Height; j++)
+                        {
+                            scope.StructureBitmap.SetPixel(i, j, scope.StructureArray[i, j].Color);
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void UpdateArrayStructure(Scope scope)
+        {
+            if (scope != null)
+            {
+                scope.StructureArray = new Grain[scope.Width, scope.Height];
+
+                Dictionary<Color, int> grainIds = new Dictionary<Color, int>
+                {
+                    { Color.FromArgb(0, 0, 0), -1 },
+                    { Color.FromArgb(1, 1, 1), 0 }
+                };
+
+                if (scope.StructureBitmap != null)
+                {
+                    for (int i = 0; i < scope.Width; i++)
+                    {
+                        for (int j = 0; j < scope.Height; j++)
+                        {
+                            var color = scope.StructureBitmap.GetPixel(i, j);
+                            scope.StructureArray[i, j] = new Grain()
+                            {
+                                Color = color,
+                                Id = chooseGrainId(grainIds, color),
+                                // set phase if needed
+                                Phase = 1
+                            };
+                        }
+                    }
+                }
+            }
+        }
+
         public static Scope InitStructure(SimulationProperties properties, Random random)
         {
             var scope = new Scope(properties.ScopeWidth, properties.ScopeHeight)
             {
                 IsFull = false
             };
-            
+
             AddBlackBorder(scope);
 
             for (int i = 1; i < scope.Width - 1; i++)
@@ -31,7 +80,7 @@ namespace MultiscaleModelling.Common
                     };
                 }
             }
-            
+
             for (int grainNumber = 0; grainNumber < properties.NumberOfGrains; grainNumber++)
             {
                 var coordinates = RandomCoordinates(properties, random);
@@ -87,6 +136,26 @@ namespace MultiscaleModelling.Common
         public static Color RandomColor(Random random)
         {
             return Color.FromArgb(random.Next(2, 254), random.Next(2, 254), random.Next(2, 254));
+        }
+
+        private static int chooseGrainId(Dictionary<Color, int> grainIds, Color color)
+        {
+            int nextId = grainIds.Values.Max() + 1;
+
+            if (grainIds.ContainsKey(color))
+            {
+                if (!grainIds.TryGetValue(color, out int id))
+                {
+                    grainIds[color] = nextId;
+                    return nextId;
+                }
+                return id;
+            }
+            else
+            {
+                grainIds.Add(color, nextId);
+                return nextId;
+            }
         }
     }
 }

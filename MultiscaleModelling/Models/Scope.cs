@@ -24,8 +24,8 @@ namespace MultiscaleModelling.Models
 
         public Grain[,] StructureArray { get; set; }
 
-        public Bitmap StructureBitmap { get; set; } 
+        public Bitmap StructureBitmap { get; set; }
 
-        public bool IsFull { get; set; }
+        public bool IsFull { get; set; } = false;
     }
 }

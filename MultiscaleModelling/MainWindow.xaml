@@ -5,20 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiscaleModelling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="700">
+        Title="MainWindow" Height="600" Width="900">
 
     <Border Padding="10">
         <StackPanel>
             <Grid RenderTransformOrigin="0.582,4.753">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="4*" />
-                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <!-- PROPERTIES -->
-                <StackPanel Grid.Column="0">
+                <StackPanel Grid.Column="0" Height="550">
                     <TextBlock Text="Properties" FontWeight="Bold" Margin="10"></TextBlock>
-                    
+
                     <!-- CLASS 1 -->
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
@@ -40,12 +40,41 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- CLASS 2 -->
+                    <!-- CLASS 3 -->                    
+                    <StackPanel Height="220">
+                        
+                    </StackPanel>
 
-                    
                     <!-- START -->
                     <Grid Margin="15">
-                        <Button x:Name="StartButton" Click="StartButton_Click" Width="120" Height="20">Start simulation</Button>
+                        <Button x:Name="StartButton" Click="StartButton_Click" Background="Beige" Width="120" Height="40">Start simulation</Button>
+                    </Grid>
+
+                    <!-- CLASS 2 -->
+                    <Grid Margin="15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                    <!-- SAVE FILE -->
+                        <StackPanel Grid.Column="0">
+                            <Button x:Name="SaveTxtButton" Click="SaveTxtButton_Click"  Background="Beige"  Width="120" Height="20">Save txt file</Button>
+                            <Button x:Name="SaveBitmapButton" Click="SaveBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Save bitmap</Button>
+                        </StackPanel>
+                    <!-- READ FILE -->
+                        <StackPanel Grid.Column="1">
+                            <Label Content="File name to upload"  Width="120"/>
+                            <TextBox Text="" x:Name="ReadFileNameTextBox" Padding="5" Width="120"/>
+                        </StackPanel>
+                        <StackPanel  Grid.Column="2">
+                            <Button x:Name="ReadTxtButton" Click="ReadTxtButton_Click"  Background="Beige"  Width="120" Height="20">Read txt file</Button>
+                            <Button x:Name="ReadBitmapButton" Click="ReadBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Read bitmap</Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="15">
+                        <Label x:Name="ResultLabel" Height="30"></Label>
                     </Grid>
 
                 </StackPanel>

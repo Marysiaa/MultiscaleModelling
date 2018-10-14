@@ -1,21 +1,9 @@
 ﻿using MultiscaleModelling.CellularAutomata;
 using MultiscaleModelling.Common;
+using MultiscaleModelling.File;
 using MultiscaleModelling.Models;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace MultiscaleModelling
@@ -46,13 +34,19 @@ namespace MultiscaleModelling
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            currentScope = CA.Grow(previousScope, properties.NeighbourhoodType);
-            StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
-            previousScope = currentScope;            
+            if (currentScope == null || !currentScope.IsFull)
+            {
+                currentScope = CA.Grow(previousScope, properties.NeighbourhoodType);
+                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                previousScope = currentScope;
+            }
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
+            previousScope = null;
+            currentScope = null;
+
             properties = new SimulationProperties()
             {
                 ScopeWidth = (int)StructureImage.Width, // 302,
@@ -63,6 +57,50 @@ namespace MultiscaleModelling
             previousScope = StructureHelpers.InitStructure(properties, random);
 
             dispatcherTimer.Start();
+        }
+
+        private void SaveTxtButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = FileSaver.SaveTxtFile(currentScope);
+            ResultLabel.Content = string.Concat("File save result: ", result);
+        }
+
+        private void SaveBitmapButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = FileSaver.SaveBitmapFile(currentScope);
+            ResultLabel.Content = string.Concat("File save result: ", result);
+        }
+
+        private void ReadTxtButton_Click(object sender, RoutedEventArgs e)
+        {
+            string fileName = ReadFileNameTextBox.Text;
+            currentScope = FileReader.ReadTxtFile(fileName);
+
+            if (currentScope != null)
+            {
+                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                ResultLabel.Content = "File read result: structure uploaded";
+            }
+            else
+            {
+                ResultLabel.Content = "File read result: file does not exist or is incorrect";
+            }
+        }
+
+        private void ReadBitmapButton_Click(object sender, RoutedEventArgs e)
+        {
+            string fileName = ReadFileNameTextBox.Text;
+            currentScope = FileReader.ReadBitmapFile(fileName);
+
+            if (currentScope != null)
+            {
+                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                ResultLabel.Content = "File read result: structure uploaded";
+            }
+            else
+            {
+                ResultLabel.Content = "File read result: file does not exist or is incorrect";
+            }
         }
 
         private NeighbourhoodType chooseNeighbourhoodType()

@@ -1,19 +1,15 @@
-﻿using MultiscaleModelling.Models;
-using System;
+﻿using MultiscaleModelling.Common;
+using MultiscaleModelling.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using System.Windows.Media.Imaging;
-using MultiscaleModelling.Common;
+using System.Linq;
 
 namespace MultiscaleModelling.CellularAutomata
 {
     public class CA
     {
         public CA() { }
-
+        
         public Scope Grow(Scope previousStructure, NeighbourhoodType neighbourhoodType)
         {
             var currentStructure = new Scope(previousStructure.Width, previousStructure.Height);
@@ -74,7 +70,7 @@ namespace MultiscaleModelling.CellularAutomata
 
             currentStructure.IsFull = isFull;
 
-            updateBitmap(currentStructure);
+            StructureHelpers.UpdateBitmap(currentStructure);
 
             return currentStructure;
         }
@@ -105,25 +101,6 @@ namespace MultiscaleModelling.CellularAutomata
                 structureArray[i, j + 1]
             };
             return neighbourhood;
-        }
-
-        private void updateBitmap(Scope scope)
-        {
-            if (scope.StructureBitmap == null)
-            {
-                scope.StructureBitmap = new Bitmap(scope.Width, scope.Height);
-            }
-
-            if (scope.StructureArray != null)
-            {
-                for (int i = 0; i < scope.Width; i++)
-                {
-                    for (int j = 0; j < scope.Height; j++)
-                    {
-                        scope.StructureBitmap.SetPixel(i, j, scope.StructureArray[i, j].Color);
-                    }
-                }
-            }
         }
     }
 }

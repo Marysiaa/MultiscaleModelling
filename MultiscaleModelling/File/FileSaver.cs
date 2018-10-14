@@ -1,22 +1,65 @@
 ﻿using MultiscaleModelling.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiscaleModelling.File
 {
     public static class FileSaver
     {
-        public static Scope SaveTxtFile()
+        public static string SaveTxtFile(Scope scopeToSave)
         {
-            throw new NotImplementedException();
+            string path = "..\\..\\Structures\\TxtFiles";
+            Directory.CreateDirectory(path);
+
+            string fileName = string.Concat("structure_", DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss"), ".txt");
+            string pathString = Path.Combine(path, fileName);
+
+            StringBuilder content = new StringBuilder();
+            content.Append(string.Concat(scopeToSave.Width, Environment.NewLine, scopeToSave.Height, Environment.NewLine));
+
+            for (int x = 0; x < scopeToSave.Width; x++)
+            {
+                for (int y = 0; y < scopeToSave.Height; y++)
+                {
+                    content.Append(scopeToSave.StructureArray[x, y].Id).Append("=");
+                    content.Append(scopeToSave.StructureArray[x, y].Phase).Append("=");
+                    content.Append(scopeToSave.StructureArray[x, y].Color.R).Append("=");
+                    content.Append(scopeToSave.StructureArray[x, y].Color.G).Append("=");
+                    content.Append(scopeToSave.StructureArray[x, y].Color.B).Append(" ");
+                }
+                content.Append(Environment.NewLine);
+            }
+
+            try
+            {
+                System.IO.File.WriteAllText(pathString, content.ToString());
+            }
+            catch (IOException e)
+            {
+                return e.ToString();
+            }
+            return fileName;
         }
 
-        public static Scope SaveBitmapFile()
+        public static string SaveBitmapFile(Scope scopeToSave)
         {
-            throw new NotImplementedException();
+            string path = "..\\..\\Structures\\Bitmaps";
+            Directory.CreateDirectory(path);
+
+            string fileName = string.Concat("structure_", DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss"), "-", scopeToSave.Width, "-", scopeToSave.Height, ".bmp");
+            string pathString = Path.Combine(path, fileName);
+
+            try
+            {
+                scopeToSave.StructureBitmap.Save(pathString, ImageFormat.Bmp);
+            }
+            catch (Exception e)
+            {
+                return e.ToString();
+            }
+            return fileName;
         }
     }
 }

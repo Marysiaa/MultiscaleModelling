@@ -25,7 +25,10 @@ namespace MultiscaleModelling
         {
             InitializeComponent();
 
-            // select method if needed
+            AterRadioButton.IsEnabled = (currentScope != null) ? currentScope.IsFull : false;
+            AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
+
+            // select method if neededs
             this.CA = new CA();
             this.random = new Random();
 
@@ -42,7 +45,10 @@ namespace MultiscaleModelling
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                 previousScope = currentScope;
             }
-            // after growth inclusions
+            else if (!AterRadioButton.IsEnabled && (bool)EnableInclusionsCheckBox.IsChecked)
+            {
+                AterRadioButton.IsEnabled = true;
+            }
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
@@ -50,21 +56,7 @@ namespace MultiscaleModelling
             previousScope = null;
             currentScope = null;
 
-            properties = new SimulationProperties()
-            {
-                ScopeWidth = (int)StructureImage.Width,
-                ScopeHeight = (int)StructureImage.Height,
-                NumberOfGrains = Converters.StringToInt(NumberOfGrainsTextBox.Text),
-                NeighbourhoodType = chooseNeighbourhoodType(),
-                Inclusions = new InclusionsProperties()
-                {
-                    AreEnable = (bool)EnableInclusionsCheckBox.IsChecked,
-                    Amount = Converters.StringToInt(AmountOfInclusionsTextBox.Text),
-                    Size = Converters.StringToInt(SizeOfInclusionsTextBox.Text),
-                    CreationTime = chooseCreationTime(),
-                    InclusionsType = chooseInclusionsType()
-                }
-            };
+            setUpProperties();
             previousScope = StructureHelpers.InitStructure(properties, random);
 
             dispatcherTimer.Start();
@@ -141,9 +133,11 @@ namespace MultiscaleModelling
                 {
                     case FileType.Bitmap:
                         currentScope = FileReader.ReadBitmapFile(filePath);
+                        previousScope = currentScope;
                         break;
                     case FileType.Txt:
                         currentScope = FileReader.ReadTxtFile(filePath);
+                        previousScope = currentScope;
                         break;
                 }
 
@@ -151,6 +145,10 @@ namespace MultiscaleModelling
                 {
                     StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                     ResultLabel.Content = "File read result: structure uploaded";
+                    if (EnableInclusionsCheckBox.IsEnabled)
+                    {
+                        AterRadioButton.IsEnabled = currentScope.IsFull;
+                    }
                 }
                 else
                 {
@@ -171,6 +169,26 @@ namespace MultiscaleModelling
             }
         }
 
+        private void AddInclusionsButton_Click(object sender, RoutedEventArgs e)
+        {
+            setUpProperties();
+
+            if (properties.Inclusions.AreEnable && (properties.Inclusions.CreationTime == InclusionsCreationTime.After))
+            {
+                var inclusions = new Inclusions(properties.Inclusions, random);
+                currentScope = inclusions.AddInclusionsAfterGrainGrowth(currentScope);
+
+                StructureHelpers.UpdateBitmap(currentScope);
+                previousScope = currentScope;
+                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+            }
+        }
+
+        private void AterRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
+        }
+
         private InclusionsType chooseInclusionsType()
         {
             if (SquareRadioButton.IsChecked == true)
@@ -181,6 +199,44 @@ namespace MultiscaleModelling
             {
                 return InclusionsType.Circular;
             }
+        }
+
+        private void BeginningRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
+        }
+
+        private void EnableInclusionsCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (BeginningRadioButton.IsEnabled)
+            {
+                AterRadioButton.IsEnabled = (currentScope != null) ? currentScope.IsFull : false;
+                AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
+            }
+            else
+            {
+                AterRadioButton.IsEnabled = false;
+                AddInclusionsButton.IsEnabled = false;
+            }
+        }
+
+        private void setUpProperties()
+        {
+            properties = new SimulationProperties()
+            {
+                ScopeWidth = (int)StructureImage.Width,
+                ScopeHeight = (int)StructureImage.Height,
+                NumberOfGrains = Converters.StringToInt(NumberOfGrainsTextBox.Text),
+                NeighbourhoodType = chooseNeighbourhoodType(),
+                Inclusions = new InclusionsProperties()
+                {
+                    AreEnable = (bool)EnableInclusionsCheckBox.IsChecked,
+                    Amount = Converters.StringToInt(AmountOfInclusionsTextBox.Text),
+                    Size = Converters.StringToInt(SizeOfInclusionsTextBox.Text),
+                    CreationTime = chooseCreationTime(),
+                    InclusionsType = chooseInclusionsType()
+                }
+            };
         }
     }
 }

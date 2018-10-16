@@ -1,5 +1,6 @@
 ﻿using MultiscaleModelling.Common;
 using MultiscaleModelling.Models;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -32,14 +33,14 @@ namespace MultiscaleModelling.CellularAutomata
                         switch (neighbourhoodType)
                         {
                             case NeighbourhoodType.Moore:
-                                neighbourhood = TakeMooreNeighbourhood(i, j, previousStructure.StructureArray);
+                                neighbourhood = takeMooreNeighbourhood(i, j, previousStructure.StructureArray);
                                 break;
                             case NeighbourhoodType.Neumann:
-                                neighbourhood = TakeNeumannNeighbourhood(i, j, previousStructure.StructureArray);
+                                neighbourhood = takeNeumannNeighbourhood(i, j, previousStructure.StructureArray);
                                 break;
                         }
 
-                        var groups = neighbourhood.Where(g => g.Id != -1 && g.Id != 0).GroupBy(g => g.Id);
+                        var groups = neighbourhood.Where(g => !StructureHelpers.IsIdSpecial(g.Id)).GroupBy(g => g.Id);
                         if (groups.Any())
                         {
                             var dictionary = new Dictionary<Grain, int>();
@@ -75,7 +76,7 @@ namespace MultiscaleModelling.CellularAutomata
             return currentStructure;
         }
         
-        private List<Grain> TakeMooreNeighbourhood(int i, int j, Grain[,] structureArray)
+        private List<Grain> takeMooreNeighbourhood(int i, int j, Grain[,] structureArray)
         {
             var neighbourhood = new List<Grain>
             {
@@ -91,7 +92,7 @@ namespace MultiscaleModelling.CellularAutomata
             return neighbourhood;
         }
 
-        private List<Grain> TakeNeumannNeighbourhood(int i, int j, Grain[,] structureArray)
+        private List<Grain> takeNeumannNeighbourhood(int i, int j, Grain[,] structureArray)
         {
             var neighbourhood = new List<Grain>
             {
@@ -102,5 +103,6 @@ namespace MultiscaleModelling.CellularAutomata
             };
             return neighbourhood;
         }
+
     }
 }

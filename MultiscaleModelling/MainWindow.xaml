@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiscaleModelling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="900">
+        Title="MainWindow" Height="800" Width="1000">
 
     <Border Padding="10">
         <StackPanel>
@@ -16,22 +16,22 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- PROPERTIES -->
-                <StackPanel Grid.Column="0" Height="550">
+                <StackPanel Grid.Column="0" Height="750">
                     <TextBlock Text="Properties" FontWeight="Bold" Margin="10"></TextBlock>
 
                     <!-- CLASS 1 -->
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Number of grains" />
                         <TextBox Grid.Column="1" Text="10" x:Name="NumberOfGrainsTextBox" Padding="5"/>
                     </Grid>
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Neighbourhood type"/>
                         <StackPanel Grid.Column="1" Margin="5">
@@ -40,9 +40,74 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- CLASS 3 -->                    
-                    <StackPanel Height="220">
-                        
+                    <!-- CLASS 3 -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" x:Name="EnableInclusionsCheckBox" 
+                                      IsChecked="True" Margin="5"></CheckBox>
+                            <Label Grid.Column="1">Inclusions</Label>
+                        </Grid>
+                    </Grid>
+
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Amount of inclusions" />
+                        <TextBox Grid.Column="1" Text="5" x:Name="AmountOfInclusionsTextBox" 
+                                 Padding="5" IsEnabled="{Binding ElementName=EnableInclusionsCheckBox, Path=IsChecked}"/>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Size of inclusions" />
+                        <TextBox Grid.Column="1" Text="2" x:Name="SizeOfInclusionsTextBox" 
+                                 Padding="5" IsEnabled="{Binding ElementName=EnableInclusionsCheckBox, Path=IsChecked}"/>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Type of inclusion"/>
+                            <StackPanel Grid.Column="1" Margin="5">
+                                <RadioButton x:Name="SquareRadioButton" Margin="2" IsChecked="true"
+                                              IsEnabled="{Binding ElementName=EnableInclusionsCheckBox, Path=IsChecked}">Square</RadioButton>
+                                <RadioButton x:Name="CircularRadioButton" Margin="2" IsChecked="false"
+                                              IsEnabled="{Binding ElementName=EnableInclusionsCheckBox, Path=IsChecked}">Circular</RadioButton>
+                            </StackPanel>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Time of creation"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="BeginningRadioButton" Margin="2" IsChecked="true"
+                                          IsEnabled="{Binding ElementName=EnableInclusionsCheckBox, Path=IsChecked}">Beginning of simulation</RadioButton>
+                            <RadioButton x:Name="AterRadioButton" Margin="2" IsChecked="false">After simulation (on grain boundaries)</RadioButton>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- CLASS 4 -->
+                    <StackPanel Height="200">
+
+
+
+
+
                     </StackPanel>
 
                     <!-- START -->
@@ -55,19 +120,14 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                    <!-- SAVE FILE -->
+                        <!-- SAVE FILE -->
                         <StackPanel Grid.Column="0">
                             <Button x:Name="SaveTxtButton" Click="SaveTxtButton_Click"  Background="Beige"  Width="120" Height="20">Save txt file</Button>
                             <Button x:Name="SaveBitmapButton" Click="SaveBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Save bitmap</Button>
                         </StackPanel>
-                    <!-- READ FILE -->
-                        <StackPanel Grid.Column="1">
-                            <Label Content="File name to upload"  Width="120"/>
-                            <TextBox Text="" x:Name="ReadFileNameTextBox" Padding="5" Width="120"/>
-                        </StackPanel>
-                        <StackPanel  Grid.Column="2">
+                        <!-- READ FILE -->
+                        <StackPanel  Grid.Column="1">
                             <Button x:Name="ReadTxtButton" Click="ReadTxtButton_Click"  Background="Beige"  Width="120" Height="20">Read txt file</Button>
                             <Button x:Name="ReadBitmapButton" Click="ReadBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Read bitmap</Button>
                         </StackPanel>

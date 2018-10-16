@@ -68,6 +68,13 @@ namespace MultiscaleModelling.Common
 
             AddBlackBorder(scope);
 
+            if (properties.Inclusions.AreEnable && (properties.Inclusions.CreationTime == InclusionsCreationTime.Beginning))
+            {
+                var inclusions = new Inclusions(properties.Inclusions);
+
+                // beginning inclusions
+            }
+
             for (int i = 1; i < scope.Width - 1; i++)
             {
                 for (int j = 1; j < scope.Height - 1; j++)

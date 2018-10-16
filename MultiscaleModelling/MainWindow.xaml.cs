@@ -1,8 +1,10 @@
-﻿using MultiscaleModelling.CellularAutomata;
+﻿using Microsoft.Win32;
+using MultiscaleModelling.CellularAutomata;
 using MultiscaleModelling.Common;
 using MultiscaleModelling.File;
 using MultiscaleModelling.Models;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -40,6 +42,7 @@ namespace MultiscaleModelling
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                 previousScope = currentScope;
             }
+            // after growth inclusions
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
@@ -49,10 +52,18 @@ namespace MultiscaleModelling
 
             properties = new SimulationProperties()
             {
-                ScopeWidth = (int)StructureImage.Width, // 302,
-                ScopeHeight = (int)StructureImage.Height, // 302,
+                ScopeWidth = (int)StructureImage.Width,
+                ScopeHeight = (int)StructureImage.Height,
                 NumberOfGrains = Converters.StringToInt(NumberOfGrainsTextBox.Text),
-                NeighbourhoodType = chooseNeighbourhoodType()
+                NeighbourhoodType = chooseNeighbourhoodType(),
+                Inclusions = new InclusionsProperties()
+                {
+                    AreEnable = (bool)EnableInclusionsCheckBox.IsChecked,
+                    Amount = Converters.StringToInt(AmountOfInclusionsTextBox.Text),
+                    Size = Converters.StringToInt(SizeOfInclusionsTextBox.Text),
+                    CreationTime = chooseCreationTime(),
+                    InclusionsType = chooseInclusionsType()
+                }
             };
             previousScope = StructureHelpers.InitStructure(properties, random);
 
@@ -61,46 +72,22 @@ namespace MultiscaleModelling
 
         private void SaveTxtButton_Click(object sender, RoutedEventArgs e)
         {
-            var result = FileSaver.SaveTxtFile(currentScope);
-            ResultLabel.Content = string.Concat("File save result: ", result);
+            openSaveDialogBox(FileType.Txt);
         }
 
         private void SaveBitmapButton_Click(object sender, RoutedEventArgs e)
         {
-            var result = FileSaver.SaveBitmapFile(currentScope);
-            ResultLabel.Content = string.Concat("File save result: ", result);
+            openSaveDialogBox(FileType.Bitmap);
         }
 
         private void ReadTxtButton_Click(object sender, RoutedEventArgs e)
         {
-            string fileName = ReadFileNameTextBox.Text;
-            currentScope = FileReader.ReadTxtFile(fileName);
-
-            if (currentScope != null)
-            {
-                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
-                ResultLabel.Content = "File read result: structure uploaded";
-            }
-            else
-            {
-                ResultLabel.Content = "File read result: file does not exist or is incorrect";
-            }
+            openReadDialog(FileType.Txt);
         }
 
         private void ReadBitmapButton_Click(object sender, RoutedEventArgs e)
         {
-            string fileName = ReadFileNameTextBox.Text;
-            currentScope = FileReader.ReadBitmapFile(fileName);
-
-            if (currentScope != null)
-            {
-                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
-                ResultLabel.Content = "File read result: structure uploaded";
-            }
-            else
-            {
-                ResultLabel.Content = "File read result: file does not exist or is incorrect";
-            }
+            openReadDialog(FileType.Bitmap);
         }
 
         private NeighbourhoodType chooseNeighbourhoodType()
@@ -112,6 +99,87 @@ namespace MultiscaleModelling
             else
             {
                 return NeighbourhoodType.Neumann;
+            }
+        }
+
+        private void openSaveDialogBox(FileType type)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.FileName = FileHelper.DecideFileName(type);
+            saveFileDialog.DefaultExt = FileHelper.DecideExtension(type);
+
+            bool? result = saveFileDialog.ShowDialog();
+            if (result == true)
+            {
+                var output = "";
+                var filePath = Path.GetFullPath(saveFileDialog.FileName);
+                switch (type)
+                {
+                    case FileType.Bitmap:
+                        output = FileSaver.SaveBitmapFile(currentScope, filePath);
+                        break;
+                    case FileType.Txt:
+                        output = FileSaver.SaveTxtFile(currentScope, filePath);
+                        break;
+                }
+                ResultLabel.Content = string.Concat("File save result: ", output);
+            }
+        }
+
+        private void openReadDialog(FileType type)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.DefaultExt = FileHelper.DecideExtension(type);
+
+            bool? result = openFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filePath = Path.GetFullPath(openFileDialog.FileName);
+                switch (type)
+                {
+                    case FileType.Bitmap:
+                        currentScope = FileReader.ReadBitmapFile(filePath);
+                        break;
+                    case FileType.Txt:
+                        currentScope = FileReader.ReadTxtFile(filePath);
+                        break;
+                }
+
+                if (currentScope != null)
+                {
+                    StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                    ResultLabel.Content = "File read result: structure uploaded";
+                }
+                else
+                {
+                    ResultLabel.Content = "File read result: file does not exist or is incorrect";
+                }
+            }
+        }
+
+        private InclusionsCreationTime chooseCreationTime()
+        {
+            if (BeginningRadioButton.IsChecked == true)
+            {
+                return InclusionsCreationTime.Beginning;
+            }
+            else
+            {
+                return InclusionsCreationTime.After;
+            }
+        }
+
+        private InclusionsType chooseInclusionsType()
+        {
+            if (SquareRadioButton.IsChecked == true)
+            {
+                return InclusionsType.Square;
+            }
+            else
+            {
+                return InclusionsType.Circular;
             }
         }
     }

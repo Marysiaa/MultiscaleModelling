@@ -8,15 +8,8 @@ namespace MultiscaleModelling.File
 {
     public static class FileReader
     {
-        public static Scope ReadTxtFile(string fileName)
+        public static Scope ReadTxtFile(string pathString)
         {
-            string path = "..\\..\\Structures\\TxtFiles";
-            if (!Directory.Exists(path))
-            {
-                return null;
-            }
-            string pathString = Path.Combine(path, string.Concat(fileName, ".txt"));
-
             String input;
             try
             {
@@ -53,26 +46,19 @@ namespace MultiscaleModelling.File
 
         }
 
-        public static Scope ReadBitmapFile(string fileName)
+        public static Scope ReadBitmapFile(string pathString)
         {
-            string path = "..\\..\\Structures\\Bitmaps";
-            if (!Directory.Exists(path))
-            {
-                return null;
-            }
-            string pathString = Path.Combine(path, string.Concat(fileName, ".bmp"));
+            Bitmap img = new Bitmap(pathString);
+            int width = img.Width;
+            int height = img.Height;
 
-            var nameParts = fileName.Split('-');
-
-            int width = Converters.StringToInt(nameParts[nameParts.Length - 1]);
-            int height = Converters.StringToInt(nameParts[nameParts.Length - 2]);
             var scope = new Scope(width, height);
 
             try
             {
                 scope.StructureBitmap = new Bitmap(pathString);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }

@@ -8,14 +8,8 @@ namespace MultiscaleModelling.File
 {
     public static class FileSaver
     {
-        public static string SaveTxtFile(Scope scopeToSave)
+        public static string SaveTxtFile(Scope scopeToSave, string pathString)
         {
-            string path = "..\\..\\Structures\\TxtFiles";
-            Directory.CreateDirectory(path);
-
-            string fileName = string.Concat("structure_", DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss"), ".txt");
-            string pathString = Path.Combine(path, fileName);
-
             StringBuilder content = new StringBuilder();
             content.Append(string.Concat(scopeToSave.Width, Environment.NewLine, scopeToSave.Height, Environment.NewLine));
 
@@ -40,17 +34,12 @@ namespace MultiscaleModelling.File
             {
                 return e.ToString();
             }
-            return fileName;
+
+            return Path.GetFileName(pathString);
         }
 
-        public static string SaveBitmapFile(Scope scopeToSave)
+        public static string SaveBitmapFile(Scope scopeToSave, string pathString)
         {
-            string path = "..\\..\\Structures\\Bitmaps";
-            Directory.CreateDirectory(path);
-
-            string fileName = string.Concat("structure_", DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss"), "-", scopeToSave.Width, "-", scopeToSave.Height, ".bmp");
-            string pathString = Path.Combine(path, fileName);
-
             try
             {
                 scopeToSave.StructureBitmap.Save(pathString, ImageFormat.Bmp);
@@ -59,7 +48,8 @@ namespace MultiscaleModelling.File
             {
                 return e.ToString();
             }
-            return fileName;
+
+            return Path.GetFileName(pathString);
         }
     }
 }

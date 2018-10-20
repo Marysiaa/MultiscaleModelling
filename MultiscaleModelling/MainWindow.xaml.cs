@@ -45,9 +45,10 @@ namespace MultiscaleModelling
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                 previousScope = currentScope;
             }
-            else if (!AterRadioButton.IsEnabled && (bool)EnableInclusionsCheckBox.IsChecked)
+            else
             {
-                AterRadioButton.IsEnabled = true;
+                DispatcherTimer timer = (DispatcherTimer)sender;
+                timer.Stop();
             }
         }
 
@@ -179,6 +180,7 @@ namespace MultiscaleModelling
                 currentScope = inclusions.AddInclusionsAfterGrainGrowth(currentScope);
 
                 StructureHelpers.UpdateBitmap(currentScope);
+                currentScope.IsFull = true;
                 previousScope = currentScope;
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
             }

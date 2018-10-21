@@ -177,11 +177,18 @@ namespace MultiscaleModelling
             if (properties.Inclusions.AreEnable && (properties.Inclusions.CreationTime == InclusionsCreationTime.After))
             {
                 var inclusions = new Inclusions(properties.Inclusions, random);
+
+                var filePath = @"..\..\Structures\structureforinlusions.bmp";
+                FileSaver.SaveBitmapFile(currentScope, filePath);
+                currentScope = FileReader.ReadBitmapFile(filePath);
+                previousScope = currentScope;
+
                 currentScope = inclusions.AddInclusionsAfterGrainGrowth(currentScope);
 
                 StructureHelpers.UpdateBitmap(currentScope);
                 currentScope.IsFull = true;
                 previousScope = currentScope;
+
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
             }
         }

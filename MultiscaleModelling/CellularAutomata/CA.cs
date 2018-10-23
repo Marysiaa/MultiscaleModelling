@@ -9,14 +9,20 @@ namespace MultiscaleModelling.CellularAutomata
 {
     public class CA
     {
-        public CA() { }
-        
-        public Scope Grow(Scope previousStructure, NeighbourhoodType neighbourhoodType)
+        private Random random { get; set; }
+
+        public CA(Random random)
+        {
+            this.random = random;
+        }
+
+        public Scope Grow(Scope previousStructure, NeighbourhoodType neighbourhoodType, int? growthProbability)
         {
             var currentStructure = new Scope(previousStructure.Width, previousStructure.Height);
             StructureHelpers.AddBlackBorder(currentStructure);
 
             var isFull = true;
+            var isGrowthExtended = neighbourhoodType == NeighbourhoodType.ExtendedMoore ? true : false;
             List<Grain> neighbourhood = new List<Grain>();
 
             for (int i = 1; i < previousStructure.Width - 1; i++)
@@ -30,37 +36,116 @@ namespace MultiscaleModelling.CellularAutomata
 
                     else if (previousStructure.StructureArray[i, j].Id == 0)
                     {
-                        switch (neighbourhoodType)
+                        if (!isGrowthExtended)
                         {
-                            case NeighbourhoodType.Moore:
-                                neighbourhood = takeMooreNeighbourhood(i, j, previousStructure.StructureArray);
-                                break;
-                            case NeighbourhoodType.Neumann:
-                                neighbourhood = takeNeumannNeighbourhood(i, j, previousStructure.StructureArray);
-                                break;
-                        }
-
-                        var groups = neighbourhood.Where(g => !StructureHelpers.IsIdSpecial(g.Id)).GroupBy(g => g.Id);
-                        if (groups.Any())
-                        {
-                            var dictionary = new Dictionary<Grain, int>();
-                            foreach (var group in groups)
+                            switch (neighbourhoodType)
                             {
-                                var number = group.Key;
-                                var total = group.Count();
-                                dictionary.Add(group.FirstOrDefault(), total);
+                                case NeighbourhoodType.Moore:
+                                    neighbourhood = takeMooreNeighbourhood(i, j, previousStructure.StructureArray);
+                                    break;
+                                case NeighbourhoodType.Neumann:
+                                    neighbourhood = takeNeumannNeighbourhood(i, j, previousStructure.StructureArray);
+                                    break;
                             }
-                            var orderedNeighbourhood = dictionary.OrderByDescending(x => x.Value);
-                            currentStructure.StructureArray[i, j] = orderedNeighbourhood.First().Key;
+
+                            var groups = neighbourhood.Where(g => !StructureHelpers.IsIdSpecial(g.Id)).GroupBy(g => g.Id);
+                            if (groups.Any())
+                            {
+                                var dictionary = new Dictionary<Grain, int>();
+                                foreach (var group in groups)
+                                {
+                                    var number = group.Key;
+                                    var total = group.Count();
+                                    dictionary.Add(group.FirstOrDefault(), total);
+                                }
+                                var orderedNeighbourhood = dictionary.OrderByDescending(x => x.Value);
+                                currentStructure.StructureArray[i, j] = orderedNeighbourhood.First().Key;
+                            }
+                            else
+                            {
+                                currentStructure.StructureArray[i, j] = new Grain()
+                                {
+                                    Id = 0,
+                                    Phase = 0,
+                                    Color = Color.White
+                                };
+                            }
                         }
                         else
                         {
-                            currentStructure.StructureArray[i, j] = new Grain()
+                            var dictionary = new Dictionary<Grain, int>();
+                            var grainGrowth = false;
+                            // rule 1
+                            neighbourhood = takeMooreNeighbourhood(i, j, previousStructure.StructureArray);
+                            var groups = neighbourhood.Where(g => !StructureHelpers.IsIdSpecial(g.Id)).GroupBy(g => g.Id);
+                            if (groups.Any())
                             {
-                                Id = 0,
-                                Phase = 0,
-                                Color = Color.White
-                            };
+                                foreach (var group in groups)
+                                {
+                                    var number = group.Key;
+                                    var total = group.Count();
+                                    dictionary.Add(group.FirstOrDefault(), total);
+                                }
+                                var orderedNeighbourhood = dictionary.OrderByDescending(x => x.Value);
+                                if (orderedNeighbourhood.First().Value >= 5)
+                                {
+                                    currentStructure.StructureArray[i, j] = orderedNeighbourhood.First().Key;
+                                    grainGrowth = true;
+                                }
+                                else
+                                {
+                                    // rule 2
+                                    neighbourhood = takeNearestMooreNeighbourhood(i, j, previousStructure.StructureArray);
+                                    groups = neighbourhood.Where(g => !StructureHelpers.IsIdSpecial(g.Id)).GroupBy(g => g.Id);
+                                    if (groups.Any())
+                                    {
+                                        orderedNeighbourhood = dictionary.OrderByDescending(x => x.Value);
+                                        if (orderedNeighbourhood.First().Value >= 3)
+                                        {
+                                            currentStructure.StructureArray[i, j] = orderedNeighbourhood.First().Key;
+                                            grainGrowth = true;
+                                        }
+                                    }
+                                    if (!grainGrowth)
+                                    {
+                                        // rule 3
+                                        neighbourhood = takeFurtherMooreNeighbourhood(i, j, previousStructure.StructureArray);
+                                        groups = neighbourhood.Where(g => !StructureHelpers.IsIdSpecial(g.Id)).GroupBy(g => g.Id);
+                                        if (groups.Any())
+                                        {
+                                            orderedNeighbourhood = dictionary.OrderByDescending(x => x.Value);
+                                            if (orderedNeighbourhood.First().Value >= 3)
+                                            {
+                                                currentStructure.StructureArray[i, j] = orderedNeighbourhood.First().Key;
+                                                grainGrowth = true;
+                                            }
+                                        }
+                                    }
+                                    if (!grainGrowth)
+                                    {
+                                        // rule 4 - Moore with probability
+                                        neighbourhood = takeMooreNeighbourhood(i, j, previousStructure.StructureArray);
+                                        groups = neighbourhood.Where(g => !StructureHelpers.IsIdSpecial(g.Id)).GroupBy(g => g.Id);
+                                        var randomProbability = random.Next(0, 100);
+                                        if (groups.Any() && (randomProbability <= growthProbability))
+                                        {
+                                            orderedNeighbourhood = dictionary.OrderByDescending(x => x.Value);
+                                            currentStructure.StructureArray[i, j] = orderedNeighbourhood.First().Key;
+                                            grainGrowth = true;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!grainGrowth)
+                            {
+                                // no grain yet
+                                currentStructure.StructureArray[i, j] = new Grain()
+                                {
+                                    Id = 0,
+                                    Phase = 0,
+                                    Color = Color.White
+                                };
+                            }
                         }
                     }
 
@@ -75,7 +160,7 @@ namespace MultiscaleModelling.CellularAutomata
 
             return currentStructure;
         }
-        
+
         private List<Grain> takeMooreNeighbourhood(int i, int j, Grain[,] structureArray)
         {
             var neighbourhood = new List<Grain>
@@ -100,6 +185,30 @@ namespace MultiscaleModelling.CellularAutomata
                 structureArray[i + 1, j],
                 structureArray[i, j - 1],
                 structureArray[i, j + 1]
+            };
+            return neighbourhood;
+        }
+
+        private List<Grain> takeNearestMooreNeighbourhood(int i, int j, Grain[,] structureArray)
+        {
+            var neighbourhood = new List<Grain>
+            {
+                structureArray[i - 1, j],
+                structureArray[i + 1, j],
+                structureArray[i, j - 1],
+                structureArray[i, j + 1]
+            };
+            return neighbourhood;
+        }
+
+        private List<Grain> takeFurtherMooreNeighbourhood(int i, int j, Grain[,] structureArray)
+        {
+            var neighbourhood = new List<Grain>
+            {
+                structureArray[i - 1, j - 1],
+                structureArray[i - 1, j + 1],
+                structureArray[i + 1, j - 1],
+                structureArray[i + 1, j + 1]
             };
             return neighbourhood;
         }

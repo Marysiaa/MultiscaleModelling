@@ -29,8 +29,8 @@ namespace MultiscaleModelling
             AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
 
             // select method if neededs
-            this.CA = new CA();
             this.random = new Random();
+            this.CA = new CA(random);
 
             dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
@@ -41,7 +41,7 @@ namespace MultiscaleModelling
         {
             if (currentScope == null || !currentScope.IsFull)
             {
-                currentScope = CA.Grow(previousScope, properties.NeighbourhoodType);
+                currentScope = CA.Grow(previousScope, properties.NeighbourhoodType, properties.GrowthProbability);
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                 previousScope = currentScope;
             }
@@ -89,9 +89,13 @@ namespace MultiscaleModelling
             {
                 return NeighbourhoodType.Moore;
             }
-            else
+            else if (NeumannRadioButton.IsChecked == true)
             {
                 return NeighbourhoodType.Neumann;
+            }
+            else
+            {
+                return NeighbourhoodType.ExtendedMoore;
             }
         }
 
@@ -244,7 +248,8 @@ namespace MultiscaleModelling
                     Size = Converters.StringToInt(SizeOfInclusionsTextBox.Text),
                     CreationTime = chooseCreationTime(),
                     InclusionsType = chooseInclusionsType()
-                }
+                },
+                GrowthProbability = Converters.StringToInt(GrowthProbabilityTextBox.Text)
             };
         }
     }

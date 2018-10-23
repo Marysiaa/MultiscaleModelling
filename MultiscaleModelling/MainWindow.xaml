@@ -36,8 +36,20 @@
                         <Label Grid.Column="0" Content="Neighbourhood type"/>
                         <StackPanel Grid.Column="1" Margin="5">
                             <RadioButton x:Name="NeumannRadioButton" Margin="2" IsChecked="false">Von Neumann</RadioButton>
-                            <RadioButton x:Name="MooreRadioButton" Margin="2" IsChecked="true">Moore</RadioButton>
+                            <RadioButton x:Name="MooreRadioButton" Margin="2" IsChecked="False">Moore</RadioButton>
+                            <RadioButton x:Name="ExtendedMooreRadioButton" Margin="2" IsChecked="true">Extended Moore</RadioButton>
                         </StackPanel>
+                    </Grid>
+
+                    <!-- CLASS 4 -->
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Growth probability" />
+                        <TextBox Grid.Column="1" Text="50" x:Name="GrowthProbabilityTextBox" 
+                                 Padding="5" IsEnabled="{Binding ElementName=ExtendedMooreRadioButton, Path=IsChecked}"/>
                     </Grid>
 
                     <!-- CLASS 3 -->
@@ -104,11 +116,8 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- CLASS 4 -->
-                    <StackPanel Height="150">
-
-
-
+                    <!-- CLASS 5 -->
+                    <StackPanel Height="100">
 
 
                     </StackPanel>

@@ -11,9 +11,11 @@
         public NeighbourhoodType NeighbourhoodType { get; set; }
 
         public InclusionsProperties Inclusions { get; set; }
+
+        public int? GrowthProbability { get; set; }
     }
 
-    public enum NeighbourhoodType { Neumann = 0, Moore = 1 }
+    public enum NeighbourhoodType { Neumann = 0, Moore = 1, ExtendedMoore = 2 }
 
     public enum SpecialIds { Empty = 0, Border = -1, Inclusion = -2 }
 }

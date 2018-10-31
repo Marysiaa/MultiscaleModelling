@@ -18,7 +18,6 @@ namespace MultiscaleModelling.File
                 for (int y = 0; y < scopeToSave.Height; y++)
                 {
                     content.Append(scopeToSave.StructureArray[x, y].Id).Append("=");
-                    content.Append(scopeToSave.StructureArray[x, y].Phase).Append("=");
                     content.Append(scopeToSave.StructureArray[x, y].Color.R).Append("=");
                     content.Append(scopeToSave.StructureArray[x, y].Color.G).Append("=");
                     content.Append(scopeToSave.StructureArray[x, y].Color.B).Append(" ");

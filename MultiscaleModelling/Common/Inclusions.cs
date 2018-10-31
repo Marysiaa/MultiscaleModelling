@@ -31,10 +31,10 @@ namespace MultiscaleModelling.Common
                 switch (inclusionsProperties.InclusionsType)
                 {
                     case InclusionsType.Square:
-                        addSquareInclusion(scope, coordinates);
+                        AddSquareInclusion(scope, coordinates);
                         break;
                     case InclusionsType.Circular:
-                        addCirularInclusion(scope, coordinates);
+                        AddCirularInclusion(scope, coordinates);
                         break;
                 }
             }
@@ -51,15 +51,15 @@ namespace MultiscaleModelling.Common
                 {
                     coordinates = StructureHelpers.RandomCoordinates(scope.Width, scope.Height, random);
                 }
-                while (!isCoordinateOnGrainBoundaries(scope, coordinates));
+                while (!IsCoordinateOnGrainBoundaries(scope, coordinates));
 
                 switch (inclusionsProperties.InclusionsType)
                 {
                     case InclusionsType.Square:
-                        addSquareInclusion(scope, coordinates);
+                        AddSquareInclusion(scope, coordinates);
                         break;
                     case InclusionsType.Circular:
-                        addCirularInclusion(scope, coordinates);
+                        AddCirularInclusion(scope, coordinates);
                         break;
                 }
             }
@@ -67,7 +67,7 @@ namespace MultiscaleModelling.Common
             return scope;
         }
 
-        private void addSquareInclusion(Scope scope, Point coordinates)
+        private void AddSquareInclusion(Scope scope, Point coordinates)
         {
             int a = (int)(inclusionsProperties.Size / Math.Sqrt(2));
             int halfA = (a / 2);
@@ -79,15 +79,14 @@ namespace MultiscaleModelling.Common
                     {
                         scope.StructureArray[x, y].Color = Color.Black;
                         scope.StructureArray[x, y].Id = Convert.ToInt32(SpecialIds.Inclusion);
-                        scope.StructureArray[x, y].Phase = 2;
                     }
                 }
             }
         }
 
-        private void addCirularInclusion(Scope scope, Point coordinates)
+        private void AddCirularInclusion(Scope scope, Point coordinates)
         {
-            var pointsInside = getPointsInsideCircle(inclusionsProperties.Size, coordinates);
+            var pointsInside = GetPointsInsideCircle(inclusionsProperties.Size, coordinates);
             foreach(var point in pointsInside)
             {
                 if(point.X < scope.Width && point.X > 0 && point.Y < scope.Height && point.Y > 0)
@@ -96,13 +95,12 @@ namespace MultiscaleModelling.Common
                     {
                         scope.StructureArray[point.X, point.Y].Color = Color.Black;
                         scope.StructureArray[point.X, point.Y].Id = Convert.ToInt32(SpecialIds.Inclusion);
-                        scope.StructureArray[point.X, point.Y].Phase = 2;
                     }
                 }
             }
         }
 
-        private IList<Point> getPointsInsideCircle(int radius, Point center)
+        private IList<Point> GetPointsInsideCircle(int radius, Point center)
         {
             List<Point> pointsInside = new List<Point>();
 
@@ -119,7 +117,7 @@ namespace MultiscaleModelling.Common
             return pointsInside;
         }
 
-        private bool isCoordinateOnGrainBoundaries(Scope scope, Point coordinates)
+        private bool IsCoordinateOnGrainBoundaries(Scope scope, Point coordinates)
         {
             var centerId = scope.StructureArray[coordinates.X, coordinates.Y].Id;
             var neighboursIds = new List<int>

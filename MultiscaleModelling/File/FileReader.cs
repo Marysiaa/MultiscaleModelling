@@ -29,8 +29,7 @@ namespace MultiscaleModelling.File
                         scope.StructureArray[i, j] = new Grain()
                         {
                             Id = Converters.StringToInt(details[0]),
-                            Phase = Converters.StringToInt(details[1]),
-                            Color = Color.FromArgb(Converters.StringToInt(details[2]), Converters.StringToInt(details[3]), Converters.StringToInt(details[4]))
+                            Color = Color.FromArgb(Converters.StringToInt(details[1]), Converters.StringToInt(details[2]), Converters.StringToInt(details[3]))
                         };
                     }
                 }

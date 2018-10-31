@@ -36,7 +36,8 @@ namespace MultiscaleModelling.Common
                 Dictionary<Color, int> grainIds = new Dictionary<Color, int>
                 {
                     { Color.FromArgb(0, 0, 0), -1 },
-                    { Color.FromArgb(1, 1, 1), 0 }
+                    { Color.FromArgb(1, 1, 1), 0 },
+                    { Color.HotPink, -3 }
                 };
 
                 if (scope.StructureBitmap != null)
@@ -49,9 +50,7 @@ namespace MultiscaleModelling.Common
                             scope.StructureArray[i, j] = new Grain()
                             {
                                 Color = color,
-                                Id = chooseGrainId(grainIds, color),
-                                // set phase if needed
-                                Phase = 1
+                                Id = ChooseGrainId(grainIds, color)
                             };
                         }
                     }
@@ -59,12 +58,20 @@ namespace MultiscaleModelling.Common
             }
         }
 
-        public static Scope InitStructure(SimulationProperties properties, Random random)
+        public static Scope InitStructure(SimulationProperties properties, Random random, Scope baseScope = null, List<int> remainingIds = null)
         {
-            var scope = new Scope(properties.ScopeWidth, properties.ScopeHeight)
+            Scope scope;
+            if (baseScope != null)
             {
-                IsFull = false
-            };
+                scope = baseScope;
+            }
+            else
+            {
+                scope = new Scope(properties.ScopeWidth, properties.ScopeHeight)
+                {
+                    IsFull = false
+                };
+            }
 
             AddBlackBorder(scope);
 
@@ -72,12 +79,14 @@ namespace MultiscaleModelling.Common
             {
                 for (int j = 1; j < scope.Height - 1; j++)
                 {
-                    scope.StructureArray[i, j] = new Grain()
+                    if (scope.StructureArray[i, j] == null)
                     {
-                        Id = 0,
-                        Phase = 0,
-                        Color = Color.White
-                    };
+                        scope.StructureArray[i, j] = new Grain()
+                        {
+                            Id = 0,
+                            Color = Color.White
+                        };
+                    }
                 }
             }
 
@@ -87,6 +96,7 @@ namespace MultiscaleModelling.Common
                 scope = inclusions.AddInclusionsAtTheBegining(scope);
             }
 
+            var id = 1;
             for (int grainNumber = 0; grainNumber < properties.NumberOfGrains; grainNumber++)
             {
                 Point coordinates;
@@ -97,9 +107,19 @@ namespace MultiscaleModelling.Common
                 while (scope.StructureArray[coordinates.X, coordinates.Y].Id != 0);
 
                 scope.StructureArray[coordinates.X, coordinates.Y].Color = RandomColor(random);
-                scope.StructureArray[coordinates.X, coordinates.Y].Id = grainNumber + 1;
 
-                scope.StructureArray[coordinates.X, coordinates.Y].Phase = 1;
+                if (remainingIds != null)
+                {
+                    while (remainingIds.Any(i => i.Equals(id)))
+                    {
+                        id++;
+                    }
+                    scope.StructureArray[coordinates.X, coordinates.Y].Id = id + 1;
+                }
+                else
+                {
+                    scope.StructureArray[coordinates.X, coordinates.Y].Id = grainNumber + 1;
+                }
             }
 
             return scope;
@@ -112,13 +132,11 @@ namespace MultiscaleModelling.Common
                 scope.StructureArray[k, 0] = new Grain()
                 {
                     Id = Convert.ToInt32(SpecialIds.Border),
-                    Phase = -1,
                     Color = Color.Black
                 };
                 scope.StructureArray[k, scope.Height - 1] = new Grain()
                 {
                     Id = Convert.ToInt32(SpecialIds.Border),
-                    Phase = -1,
                     Color = Color.Black
                 };
             }
@@ -127,13 +145,11 @@ namespace MultiscaleModelling.Common
                 scope.StructureArray[0, l] = new Grain()
                 {
                     Id = Convert.ToInt32(SpecialIds.Border),
-                    Phase = -1,
                     Color = Color.Black
                 };
                 scope.StructureArray[scope.Width - 1, l] = new Grain()
                 {
                     Id = Convert.ToInt32(SpecialIds.Border),
-                    Phase = -1,
                     Color = Color.Black
                 };
             }
@@ -154,7 +170,7 @@ namespace MultiscaleModelling.Common
             return Enum.IsDefined(typeof(SpecialIds), id);
         }
 
-        private static int chooseGrainId(Dictionary<Color, int> grainIds, Color color)
+        private static int ChooseGrainId(Dictionary<Color, int> grainIds, Color color)
         {
             int nextId = grainIds.Values.Max() + 1;
 

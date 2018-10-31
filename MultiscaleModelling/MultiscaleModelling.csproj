@@ -64,6 +64,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CellularAutomata\CA.cs" />
+    <Compile Include="CellularAutomata\StructuresGrowth.cs" />
     <Compile Include="Common\Converters.cs" />
     <Compile Include="Common\Inclusions.cs" />
     <Compile Include="Common\StructureHelpers.cs" />

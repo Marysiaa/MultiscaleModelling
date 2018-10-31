@@ -28,13 +28,13 @@ namespace MultiscaleModelling
             AterRadioButton.IsEnabled = (currentScope != null) ? currentScope.IsFull : false;
             AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
 
-            // select method if neededs
+            // select method if needed
             this.random = new Random();
             this.CA = new CA(random);
 
             dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 2);
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -47,6 +47,7 @@ namespace MultiscaleModelling
             }
             else
             {
+                EnableStructureChanges();
                 DispatcherTimer timer = (DispatcherTimer)sender;
                 timer.Stop();
             }
@@ -57,7 +58,7 @@ namespace MultiscaleModelling
             previousScope = null;
             currentScope = null;
 
-            setUpProperties();
+            SetUpProperties();
             previousScope = StructureHelpers.InitStructure(properties, random);
 
             dispatcherTimer.Start();
@@ -65,25 +66,25 @@ namespace MultiscaleModelling
 
         private void SaveTxtButton_Click(object sender, RoutedEventArgs e)
         {
-            openSaveDialogBox(FileType.Txt);
+            OpenSaveDialogBox(FileType.Txt);
         }
 
         private void SaveBitmapButton_Click(object sender, RoutedEventArgs e)
         {
-            openSaveDialogBox(FileType.Bitmap);
+            OpenSaveDialogBox(FileType.Bitmap);
         }
 
         private void ReadTxtButton_Click(object sender, RoutedEventArgs e)
         {
-            openReadDialog(FileType.Txt);
+            OpenReadDialog(FileType.Txt);
         }
 
         private void ReadBitmapButton_Click(object sender, RoutedEventArgs e)
         {
-            openReadDialog(FileType.Bitmap);
+            OpenReadDialog(FileType.Bitmap);
         }
 
-        private NeighbourhoodType chooseNeighbourhoodType()
+        private NeighbourhoodType ChooseNeighbourhoodType()
         {
             if (MooreRadioButton.IsChecked == true)
             {
@@ -99,7 +100,7 @@ namespace MultiscaleModelling
             }
         }
 
-        private void openSaveDialogBox(FileType type)
+        private void OpenSaveDialogBox(FileType type)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.RestoreDirectory = true;
@@ -124,7 +125,7 @@ namespace MultiscaleModelling
             }
         }
 
-        private void openReadDialog(FileType type)
+        private void OpenReadDialog(FileType type)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.DefaultExt = FileHelper.DecideExtension(type);
@@ -154,6 +155,7 @@ namespace MultiscaleModelling
                     {
                         AterRadioButton.IsEnabled = currentScope.IsFull;
                     }
+                    EnableStructureChanges();
                 }
                 else
                 {
@@ -162,7 +164,7 @@ namespace MultiscaleModelling
             }
         }
 
-        private InclusionsCreationTime chooseCreationTime()
+        private InclusionsCreationTime ChooseCreationTime()
         {
             if (BeginningRadioButton.IsChecked == true)
             {
@@ -174,9 +176,25 @@ namespace MultiscaleModelling
             }
         }
 
+        private StructureType ChooseStructureType()
+        {
+            if (SubstructureRadioButton.IsEnabled)
+            {
+                if (SubstructureRadioButton.IsChecked == true)
+                {
+                    return StructureType.Substructure;
+                }
+                else
+                {
+                    return StructureType.Dualphase;
+                }
+            }
+            return StructureType.Disabled;
+        }
+
         private void AddInclusionsButton_Click(object sender, RoutedEventArgs e)
         {
-            setUpProperties();
+            SetUpProperties();
 
             if (properties.Inclusions.AreEnable && (properties.Inclusions.CreationTime == InclusionsCreationTime.After))
             {
@@ -202,7 +220,7 @@ namespace MultiscaleModelling
             AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
         }
 
-        private InclusionsType chooseInclusionsType()
+        private InclusionsType ChooseInclusionsType()
         {
             if (SquareRadioButton.IsChecked == true)
             {
@@ -233,24 +251,44 @@ namespace MultiscaleModelling
             }
         }
 
-        private void setUpProperties()
+        private void GenerateButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetUpProperties();
+            var structures = new StructuresGrowth(random, currentScope);
+            currentScope = structures.ChangeStructure(properties);
+
+            previousScope = currentScope;
+            StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+        }
+
+        private void SetUpProperties()
         {
             properties = new SimulationProperties()
             {
                 ScopeWidth = (int)StructureImage.Width,
                 ScopeHeight = (int)StructureImage.Height,
                 NumberOfGrains = Converters.StringToInt(NumberOfGrainsTextBox.Text),
-                NeighbourhoodType = chooseNeighbourhoodType(),
+                NeighbourhoodType = ChooseNeighbourhoodType(),
                 Inclusions = new InclusionsProperties()
                 {
                     AreEnable = (bool)EnableInclusionsCheckBox.IsChecked,
                     Amount = Converters.StringToInt(AmountOfInclusionsTextBox.Text),
                     Size = Converters.StringToInt(SizeOfInclusionsTextBox.Text),
-                    CreationTime = chooseCreationTime(),
-                    InclusionsType = chooseInclusionsType()
+                    CreationTime = ChooseCreationTime(),
+                    InclusionsType = ChooseInclusionsType()
                 },
-                GrowthProbability = Converters.StringToInt(GrowthProbabilityTextBox.Text)
+                GrowthProbability = Converters.StringToInt(GrowthProbabilityTextBox.Text),
+                StructureType = ChooseStructureType(),
+                NumberOfRemainingGrains = Converters.StringToInt(NumberOfRemainingGringTextBox.Text)
             };
+        }
+
+        private void EnableStructureChanges()
+        {
+            SubstructureRadioButton.IsEnabled = true;
+            DualPhaseRadioButton.IsEnabled = true;
+            NumberOfRemainingGringTextBox.IsEnabled = true;
+            GenerateButton.IsEnabled = true;
         }
     }
 }

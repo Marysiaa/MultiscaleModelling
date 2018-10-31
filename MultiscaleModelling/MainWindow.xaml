@@ -64,7 +64,7 @@
                                 <ColumnDefinition Width="8*" />
                             </Grid.ColumnDefinitions>
                             <CheckBox Grid.Column="0" x:Name="EnableInclusionsCheckBox" Click="EnableInclusionsCheckBox_Click"
-                                      IsChecked="True" Margin="5"></CheckBox>
+                                      IsChecked="False" Margin="5"></CheckBox>
                             <Label Grid.Column="1">Inclusions</Label>
                         </Grid>
                     </Grid>
@@ -117,7 +117,31 @@
                     </Grid>
 
                     <!-- CLASS 5 -->
-                    <StackPanel Height="100">
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Structure"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="SubstructureRadioButton" Margin="2" IsChecked="true" Click="BeginningRadioButton_Click" IsEnabled="False">Substructure</RadioButton>
+                            <RadioButton x:Name="DualPhaseRadioButton" Margin="2" IsChecked="false" Click="AterRadioButton_Click" IsEnabled="False">Dualphase</RadioButton>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Number of remaining grains" />
+                        <StackPanel Grid.Column="1">
+                            <TextBox Text="1" x:Name="NumberOfRemainingGringTextBox" IsEnabled="False"/>
+                            <Button x:Name="GenerateButton" Click="GenerateButton_Click"  Background="Beige"  Width="120" Height="20" IsEnabled="False">Generate</Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- CLASS 6 -->
+                    <StackPanel Height="30">
 
 
                     </StackPanel>

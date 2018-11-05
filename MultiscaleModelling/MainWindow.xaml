@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiscaleModelling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1000">
+        Title="MainWindow" Height="1000" Width="1000">
 
     <Border Padding="10">
         <StackPanel>
@@ -16,7 +16,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- PROPERTIES -->
-                <StackPanel Grid.Column="0" Height="750">
+                <StackPanel Grid.Column="0" Height="950">
                     <TextBlock Text="Properties" FontWeight="Bold" Margin="10"></TextBlock>
 
                     <!-- CLASS 1 -->
@@ -141,7 +141,39 @@
                     </Grid>
 
                     <!-- CLASS 6 -->
-                    <StackPanel Height="30">
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Grain Boundaries Coloring"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="AllGrainsBoundariesRadioButton" Margin="2" IsChecked="true" Click="AllGrainsBoundariesRadioButton_Click"  IsEnabled="False">All grains</RadioButton>
+                            <RadioButton x:Name="NGrainsBoundariesRadioButton" Margin="2" IsChecked="false" Click="NGrainsBoundariesRadioButton_Click"  IsEnabled="False">N grains</RadioButton>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <Label Content="Number of grains to mark" />
+                            <Label Content="Boundary size" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBox Text="1" x:Name="NumberOfGrainsBoundariesTextBox" 
+                                     IsEnabled="{Binding ElementName=NGrainsBoundariesRadioButton, Path=IsChecked}"/>
+                            <TextBox Text="1" x:Name="BoundarySizeTextBox" IsEnabled="False"/>
+                            <Button x:Name="ColorBoundariesButton" Click="ColorBoundariesButton_Click"  Background="Beige"  Width="120" Height="20"
+                                    IsEnabled="False">Color boundaries</Button>
+                            <Button x:Name="ClearBackgroundButton" Click="ClearBackgroundButton_Click"  Background="Beige"  Width="120" Height="20" 
+                                    IsEnabled="False">Clear background</Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- CLASS 7 -->
+                    <StackPanel Height="80">
 
 
                     </StackPanel>
@@ -168,7 +200,6 @@
                             <Button x:Name="ReadBitmapButton" Click="ReadBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Read bitmap</Button>
                         </StackPanel>
                     </Grid>
-
                     <Grid Margin="15">
                         <Label x:Name="ResultLabel" Height="30"></Label>
                     </Grid>

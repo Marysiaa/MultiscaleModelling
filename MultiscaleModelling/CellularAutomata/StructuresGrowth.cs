@@ -25,7 +25,7 @@ namespace MultiscaleModelling.CellularAutomata
 
         public Scope ChangeStructure(SimulationProperties properties)
         {
-            var grainPoints = new List<Point>();
+            var grainsPoints = new List<Point>();
             Point actRandCoord = new Point(0, 0);
             List<int> prevRandIds = new List<int>();
             for (int i = 0; i < properties.NumberOfRemainingGrains.Value; i++)
@@ -36,9 +36,9 @@ namespace MultiscaleModelling.CellularAutomata
                     actRandCoord = StructureHelpers.RandomCoordinates(baseScope.Width, baseScope.Height, random);
                 }
                 while (prevRandIds.IndexOf(baseScope.StructureArray[actRandCoord.X, actRandCoord.Y].Id) != -1);
-                grainPoints.Add(actRandCoord);
+                grainsPoints.Add(actRandCoord);
             }
-            var remainingGrains = GetRemainingGrains(grainPoints);
+            var remainingGrains = GetRemainingGrains(grainsPoints);
 
             // class 5: CA -> CA
             switch (properties.StructureType)

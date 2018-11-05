@@ -55,6 +55,8 @@ namespace MultiscaleModelling
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
+            DisableAllStructureChanges();
+
             previousScope = null;
             currentScope = null;
 
@@ -261,6 +263,22 @@ namespace MultiscaleModelling
             StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
         }
 
+        private GrainsBoundariesOption ChooseGrainBoundariesOption()
+        {
+            if (AllGrainsBoundariesRadioButton.IsEnabled)
+            {
+                if (AllGrainsBoundariesRadioButton.IsChecked == true)
+                {
+                    return GrainsBoundariesOption.AllGrains;
+                }
+                else
+                {
+                    return GrainsBoundariesOption.NGrains;
+                }
+            }
+            return GrainsBoundariesOption.Disabled;
+        }
+
         private void SetUpProperties()
         {
             properties = new SimulationProperties()
@@ -279,8 +297,55 @@ namespace MultiscaleModelling
                 },
                 GrowthProbability = Converters.StringToInt(GrowthProbabilityTextBox.Text),
                 StructureType = ChooseStructureType(),
-                NumberOfRemainingGrains = Converters.StringToInt(NumberOfRemainingGringTextBox.Text)
+                NumberOfRemainingGrains = Converters.StringToInt(NumberOfRemainingGringTextBox.Text),
+                GrainBoundariesProperties = new GrainBoundariesProperties()
+                {
+                    GrainsBoundariesOption = ChooseGrainBoundariesOption(),
+                    NumberOfGrainsToSelectBoundaries = Converters.StringToInt(NumberOfGrainsBoundariesTextBox.Text),
+                    GrainBoundarySize = Converters.StringToInt(BoundarySizeTextBox.Text)
+                }
             };
+        }
+
+        private void AllGrainsBoundariesRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void NGrainsBoundariesRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ColorBoundariesButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetUpProperties();
+
+            var filePath = @"..\..\Structures\structureforinlusions.bmp";
+            FileSaver.SaveBitmapFile(currentScope, filePath);
+            currentScope = FileReader.ReadBitmapFile(filePath);
+
+            var grainBoundaries = new GrainBoundaries(random, currentScope, properties.GrainBoundariesProperties);
+            currentScope = grainBoundaries.SelectGrainBoundaries();
+
+            previousScope = currentScope;
+            StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+
+            ColorBoundariesButton.IsEnabled = false;
+            ClearBackgroundButton.IsEnabled = true;
+            DisableFirstPartOfStructureChanges();
+        }
+
+        private void ClearBackgroundButton_Click(object sender, RoutedEventArgs e)
+        {
+            var grainBoundaries = new GrainBoundaries(random, currentScope, properties.GrainBoundariesProperties);
+
+            currentScope = grainBoundaries.ClearBackground();
+
+            previousScope = currentScope;
+            StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+
+            ClearBackgroundButton.IsEnabled = false;
         }
 
         private void EnableStructureChanges()
@@ -289,6 +354,32 @@ namespace MultiscaleModelling
             DualPhaseRadioButton.IsEnabled = true;
             NumberOfRemainingGringTextBox.IsEnabled = true;
             GenerateButton.IsEnabled = true;
+
+            AllGrainsBoundariesRadioButton.IsEnabled = true;
+            NGrainsBoundariesRadioButton.IsEnabled = true;
+            ColorBoundariesButton.IsEnabled = true;
+            BoundarySizeTextBox.IsEnabled = true;
+        }
+
+        private void DisableFirstPartOfStructureChanges()
+        {
+            SubstructureRadioButton.IsEnabled = false;
+            DualPhaseRadioButton.IsEnabled = false;
+            NumberOfRemainingGringTextBox.IsEnabled = false;
+            GenerateButton.IsEnabled = false;
+        }
+
+        private void DisableAllStructureChanges()
+        {
+            SubstructureRadioButton.IsEnabled = false;
+            DualPhaseRadioButton.IsEnabled = false;
+            NumberOfRemainingGringTextBox.IsEnabled = false;
+            GenerateButton.IsEnabled = false;
+
+            AllGrainsBoundariesRadioButton.IsEnabled = false;
+            NGrainsBoundariesRadioButton.IsEnabled = false;
+            ColorBoundariesButton.IsEnabled = false;
+            BoundarySizeTextBox.IsEnabled = false;
         }
     }
 }

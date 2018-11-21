@@ -3,6 +3,7 @@ using MultiscaleModelling.CellularAutomata;
 using MultiscaleModelling.Common;
 using MultiscaleModelling.File;
 using MultiscaleModelling.Models;
+using MultiscaleModelling.MonteCarlo;
 using System;
 using System.IO;
 using System.Windows;
@@ -16,10 +17,16 @@ namespace MultiscaleModelling
     public partial class MainWindow : Window
     {
         private DispatcherTimer dispatcherTimer;
-        private SimulationProperties properties;
         private Scope previousScope, currentScope;
         private Random random;
+
+        private SimulationProperties properties;
         private CA CA;
+
+        private MCProperties MCproperties;
+        private MC MC;
+
+        private bool MCSelected = false;
 
         public MainWindow()
         {
@@ -28,7 +35,6 @@ namespace MultiscaleModelling
             AterRadioButton.IsEnabled = (currentScope != null) ? currentScope.IsFull : false;
             AddInclusionsButton.IsEnabled = (bool)AterRadioButton.IsChecked;
 
-            // select method if needed
             this.random = new Random();
             this.CA = new CA(random);
 
@@ -39,15 +45,30 @@ namespace MultiscaleModelling
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (currentScope == null || !currentScope.IsFull)
+            if (!MCSelected && (currentScope == null || !currentScope.IsFull))
             {
                 currentScope = CA.Grow(previousScope, properties.NeighbourhoodType, properties.GrowthProbability);
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                 previousScope = currentScope;
             }
+            else if (MCSelected && (currentScope == null || MC.ItertionsPerformed < MCproperties.NumberOfSteps))
+            {
+                currentScope = MC.Grow(previousScope);
+                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                previousScope = currentScope;
+            }
             else
             {
-                EnableStructureChanges();
+                if (!MCSelected)
+                {
+                    EnableCAStructureChanges();
+                    EnableMCBase();
+                }
+                if (MCSelected)
+                {
+                    EnableMCStructureChanges();
+                    EnableCABase();
+                }
                 DispatcherTimer timer = (DispatcherTimer)sender;
                 timer.Stop();
             }
@@ -55,7 +76,9 @@ namespace MultiscaleModelling
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            DisableAllStructureChanges();
+            MCSelected = false;
+            DisableMC();
+            DisableCAStructureChanges();
 
             previousScope = null;
             currentScope = null;
@@ -157,7 +180,7 @@ namespace MultiscaleModelling
                     {
                         AterRadioButton.IsEnabled = currentScope.IsFull;
                     }
-                    EnableStructureChanges();
+                    EnableCAStructureChanges();
                 }
                 else
                 {
@@ -261,6 +284,8 @@ namespace MultiscaleModelling
 
             previousScope = currentScope;
             StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+
+            DisableCAStructureChanges();
         }
 
         private GrainsBoundariesOption ChooseGrainBoundariesOption()
@@ -347,8 +372,71 @@ namespace MultiscaleModelling
 
             ClearBackgroundButton.IsEnabled = false;
         }
+        
+        private void SetUpMCProperties()
+        {
+            MCproperties = new MCProperties()
+            {
+                Neighbourhood = NeighbourhoodType.Moore,
+                NumberOfInititalStates = Converters.StringToInt(NumberOfInitialStatesTextBox.Text),
+                NumberOfSteps = Converters.StringToInt(NumberOfMCStepsTextBox.Text)
+            };
+        }
 
-        private void EnableStructureChanges()
+        private void MCStartButton_Click(object sender, RoutedEventArgs e)
+        {
+            MCSelected = true;
+            DisableCA();
+
+            previousScope = null;
+            currentScope = null;
+            
+            SetUpMCProperties();
+            this.MC = new MC(random, MCproperties);
+
+            previousScope = StructureHelpers.GenerateEmptyStructure((int)StructureImage.Width, (int)StructureImage.Height);
+
+            dispatcherTimer.Start();
+        }
+
+
+        private void DisableCA()
+        {
+            NumberOfGrainsTextBox.IsEnabled = false;
+            NeumannRadioButton.IsEnabled = false;
+            MooreRadioButton.IsEnabled = false;
+            ExtendedMooreRadioButton.IsEnabled = false;
+            GrowthProbabilityTextBox.IsEnabled = false;
+            EnableInclusionsCheckBox.IsEnabled = false;
+            AmountOfInclusionsTextBox.IsEnabled = false;
+            SizeOfInclusionsTextBox.IsEnabled = false;
+            SquareRadioButton.IsEnabled = false;
+            CircularRadioButton.IsEnabled = false;
+            BeginningRadioButton.IsEnabled = false;
+            AterRadioButton.IsEnabled = false;
+            AddInclusionsButton.IsEnabled = false;
+            SubstructureRadioButton.IsEnabled = false;
+            DualPhaseRadioButton.IsEnabled = false;
+            NumberOfRemainingGringTextBox.IsEnabled = false;
+            GenerateButton.IsEnabled = false;
+            AllGrainsBoundariesRadioButton.IsEnabled = false;
+            NGrainsBoundariesRadioButton.IsEnabled = false;
+            NumberOfGrainsBoundariesTextBox.IsEnabled = false;
+            ColorBoundariesButton.IsEnabled = false;
+            ClearBackgroundButton.IsEnabled = false; 
+        }
+
+        private void EnableCABase()
+        {
+            NumberOfGrainsTextBox.IsEnabled = true;
+            NeumannRadioButton.IsEnabled = true;
+            MooreRadioButton.IsEnabled = true;
+            ExtendedMooreRadioButton.IsEnabled = true;
+            GrowthProbabilityTextBox.IsEnabled = true;
+            EnableInclusionsCheckBox.IsEnabled = true;
+        }
+
+        private void EnableCAStructureChanges()
         {
             SubstructureRadioButton.IsEnabled = true;
             DualPhaseRadioButton.IsEnabled = true;
@@ -369,7 +457,7 @@ namespace MultiscaleModelling
             GenerateButton.IsEnabled = false;
         }
 
-        private void DisableAllStructureChanges()
+        private void DisableCAStructureChanges()
         {
             SubstructureRadioButton.IsEnabled = false;
             DualPhaseRadioButton.IsEnabled = false;
@@ -381,5 +469,30 @@ namespace MultiscaleModelling
             ColorBoundariesButton.IsEnabled = false;
             BoundarySizeTextBox.IsEnabled = false;
         }
+
+        private void DisableMC()
+        {
+            NumberOfMCStepsTextBox.IsEnabled = false;
+            MCMooreRadioButton.IsEnabled = false;
+            NumberOfInitialStatesTextBox.IsEnabled = false;
+        }
+
+        private void EnableMCBase()
+        {
+            NumberOfMCStepsTextBox.IsEnabled = true;
+            MCMooreRadioButton.IsEnabled = true;
+            NumberOfInitialStatesTextBox.IsEnabled = true;
+        }
+
+        private void EnableMCStructureChanges()
+        {
+            
+        }
+
+        private void DisableMCStructureChanges()
+        {
+
+        }
+
     }
 }

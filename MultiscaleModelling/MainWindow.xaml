@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiscaleModelling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1000">
+        Title="MainWindow" Height="1000" Width="1500">
 
     <Border Padding="10">
         <StackPanel>
@@ -13,11 +13,12 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- PROPERTIES -->
+                <!-- PROPERTIES CA -->
                 <StackPanel Grid.Column="0" Height="950">
-                    <TextBlock Text="Properties" FontWeight="Bold" Margin="10"></TextBlock>
+                    <TextBlock Text="CA Properties" FontWeight="Bold" Margin="10"></TextBlock>
 
                     <!-- CLASS 1 -->
                     <Grid Margin="5">
@@ -172,7 +173,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- CLASS 7 -->
+                    <!-- space -->
                     <StackPanel Height="80">
 
 
@@ -180,7 +181,7 @@
 
                     <!-- START -->
                     <Grid Margin="15">
-                        <Button x:Name="StartButton" Click="StartButton_Click" Background="Beige" Width="120" Height="40">Start simulation</Button>
+                        <Button x:Name="StartButton" Click="StartButton_Click" Background="Beige" Width="120" Height="40">Start CA simulation</Button>
                     </Grid>
 
                     <!-- CLASS 2 -->
@@ -208,7 +209,56 @@
 
                 <!-- IMAGE -->
                 <StackPanel Grid.Column="1">
-                    <Image x:Name="StructureImage" Height="302" Width="302" Margin="10"/>
+                    <Image x:Name="StructureImage" Height="152" Width="152" Margin="10"/>
+                </StackPanel>
+
+                <!-- PROPERTIES MC -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="MC Properties" FontWeight="Bold" Margin="10"></TextBlock>
+
+                    <!-- CLASS 8 -->
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Number of initial states" />
+                        <TextBox Grid.Column="1" Text="3" x:Name="NumberOfInitialStatesTextBox" Padding="5"/>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Neighbourhood type"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="MCMooreRadioButton" Margin="2" IsChecked="True">Moore</RadioButton>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Number of MC steps" />
+                        <TextBox Grid.Column="1" Text="20" x:Name="NumberOfMCStepsTextBox" Padding="5"/>
+                    </Grid>
+
+                    <!-- CLASS 9 -->
+                    <Grid Margin="5">
+                    </Grid>
+
+                    <!-- space -->
+                    <StackPanel Height="80">
+
+
+                    </StackPanel>
+
+                    <!-- START -->
+                    <Grid Margin="15">
+                        <Button x:Name="MCStartButton" Click="MCStartButton_Click" Background="Beige" Width="120" Height="40">Start MC simulation</Button>
+                    </Grid>
+                    
                 </StackPanel>
             </Grid>
         </StackPanel>

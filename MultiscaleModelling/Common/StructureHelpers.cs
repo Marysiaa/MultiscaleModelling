@@ -125,6 +125,30 @@ namespace MultiscaleModelling.Common
             return scope;
         }
 
+        public static Scope GenerateEmptyStructure(int width, int height)
+        {
+            Scope scope = new Scope(width, height);
+
+            AddBlackBorder(scope);
+
+            for (int i = 1; i < scope.Width - 1; i++)
+            {
+                for (int j = 1; j < scope.Height - 1; j++)
+                {
+                    if (scope.StructureArray[i, j] == null)
+                    {
+                        scope.StructureArray[i, j] = new Grain()
+                        {
+                            Id = 0,
+                            Color = Color.White
+                        };
+                    }
+                }
+            }
+
+            return scope;
+        }
+
         public static void AddBlackBorder(Scope scope)
         {
             for (int k = 0; k < scope.Width; k++)

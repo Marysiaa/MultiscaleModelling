@@ -12,7 +12,5 @@ namespace MultiscaleModelling.Models
         public int Id { get; set; }
 
         public Color Color { get; set; }
-
-        //public int Phase { get; set; }
     }
 }

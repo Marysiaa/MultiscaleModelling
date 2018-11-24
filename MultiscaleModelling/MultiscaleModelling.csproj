@@ -84,7 +84,9 @@
     <Compile Include="Models\MCProperties.cs" />
     <Compile Include="Models\Scope.cs" />
     <Compile Include="Models\SimulationProperties.cs" />
+    <Compile Include="Models\SRXProperties.cs" />
     <Compile Include="MonteCarlo\MC.cs" />
+    <Compile Include="MonteCarlo\SRX.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

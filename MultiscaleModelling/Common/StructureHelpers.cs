@@ -58,7 +58,7 @@ namespace MultiscaleModelling.Common
             }
         }
 
-        public static Scope InitStructure(SimulationProperties properties, Random random, Scope baseScope = null, List<int> remainingIds = null)
+        public static Scope InitCAStructure(SimulationProperties properties, Random random, Scope baseScope = null, List<int> remainingIds = null)
         {
             Scope scope;
             if (baseScope != null)
@@ -192,6 +192,22 @@ namespace MultiscaleModelling.Common
         public static bool IsIdSpecial(int id)
         {
             return Enum.IsDefined(typeof(SpecialIds), id);
+        }
+
+        public static List<Grain> TakeMooreNeighbourhood(int i, int j, Grain[,] structureArray)
+        {
+            var neighbourhood = new List<Grain>
+            {
+                structureArray[i - 1, j],
+                structureArray[i + 1, j],
+                structureArray[i, j - 1],
+                structureArray[i, j + 1],
+                structureArray[i - 1, j - 1],
+                structureArray[i - 1, j + 1],
+                structureArray[i + 1, j - 1],
+                structureArray[i + 1, j + 1]
+            };
+            return neighbourhood;
         }
 
         private static int ChooseGrainId(Dictionary<Color, int> grainIds, Color color)

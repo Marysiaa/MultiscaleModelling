@@ -25,8 +25,10 @@ namespace MultiscaleModelling
 
         private MCProperties MCproperties;
         private MC MC;
-
         private bool MCSelected = false;
+
+        private SRX SRX;
+        private SRXProperties SRXProperties;
 
         public MainWindow()
         {
@@ -61,13 +63,15 @@ namespace MultiscaleModelling
             {
                 if (!MCSelected)
                 {
-                    EnableCAStructureChanges();
+                    EnableStructureChanges();
                     EnableMCBase();
                 }
                 if (MCSelected)
                 {
-                    EnableMCStructureChanges();
+                    EnableStructureChanges();
+                    SubstructureRadioButton.IsEnabled = false;
                     EnableCABase();
+                    EnableSRXCheckBox.IsEnabled = true;
                 }
                 DispatcherTimer timer = (DispatcherTimer)sender;
                 timer.Stop();
@@ -84,7 +88,7 @@ namespace MultiscaleModelling
             currentScope = null;
 
             SetUpProperties();
-            previousScope = StructureHelpers.InitStructure(properties, random);
+            previousScope = StructureHelpers.InitCAStructure(properties, random);
 
             dispatcherTimer.Start();
         }
@@ -180,7 +184,8 @@ namespace MultiscaleModelling
                     {
                         AterRadioButton.IsEnabled = currentScope.IsFull;
                     }
-                    EnableCAStructureChanges();
+                    EnableStructureChanges();
+                    EnableSRXCheckBox.IsEnabled = true;
                 }
                 else
                 {
@@ -215,6 +220,22 @@ namespace MultiscaleModelling
                 }
             }
             return StructureType.Disabled;
+        }
+
+        private AdvancedMethodType ChooseAdvancedMethodType()
+        {
+            if (AdvancedCARadioButton.IsEnabled)
+            {
+                if (AdvancedCARadioButton.IsChecked == true)
+                {
+                    return AdvancedMethodType.AdvancedCA;
+                }
+                else
+                {
+                    return AdvancedMethodType.AdvancedMC;
+                }
+            }
+            return AdvancedMethodType.Disabled;
         }
 
         private void AddInclusionsButton_Click(object sender, RoutedEventArgs e)
@@ -279,13 +300,14 @@ namespace MultiscaleModelling
         private void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
             SetUpProperties();
-            var structures = new StructuresGrowth(random, currentScope);
+            SetUpMCProperties();
+            var structures = new StructuresGrowth(random, currentScope, MCproperties);
             currentScope = structures.ChangeStructure(properties);
 
             previousScope = currentScope;
             StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
 
-            DisableCAStructureChanges();
+            EnableStructureChanges();
         }
 
         private GrainsBoundariesOption ChooseGrainBoundariesOption()
@@ -328,7 +350,8 @@ namespace MultiscaleModelling
                     GrainsBoundariesOption = ChooseGrainBoundariesOption(),
                     NumberOfGrainsToSelectBoundaries = Converters.StringToInt(NumberOfGrainsBoundariesTextBox.Text),
                     GrainBoundarySize = Converters.StringToInt(BoundarySizeTextBox.Text)
-                }
+                },
+                AdvancedMethodType = ChooseAdvancedMethodType()
             };
         }
 
@@ -406,22 +429,26 @@ namespace MultiscaleModelling
             NeumannRadioButton.IsEnabled = false;
             MooreRadioButton.IsEnabled = false;
             ExtendedMooreRadioButton.IsEnabled = false;
-            GrowthProbabilityTextBox.IsEnabled = false;
+            //GrowthProbabilityTextBox.IsEnabled = false;
             EnableInclusionsCheckBox.IsEnabled = false;
-            AmountOfInclusionsTextBox.IsEnabled = false;
-            SizeOfInclusionsTextBox.IsEnabled = false;
-            SquareRadioButton.IsEnabled = false;
-            CircularRadioButton.IsEnabled = false;
-            BeginningRadioButton.IsEnabled = false;
-            AterRadioButton.IsEnabled = false;
-            AddInclusionsButton.IsEnabled = false;
+            //AmountOfInclusionsTextBox.IsEnabled = false;
+            //SizeOfInclusionsTextBox.IsEnabled = false;
+            //SquareRadioButton.IsEnabled = false;
+            //CircularRadioButton.IsEnabled = false;
+            //BeginningRadioButton.IsEnabled = false;
+            //AterRadioButton.IsEnabled = false;
+            //AddInclusionsButton.IsEnabled = false;
             SubstructureRadioButton.IsEnabled = false;
+
+            AdvancedCARadioButton.IsEnabled = false;
+            //AdvancedMCRadioButton.IsEnabled = false;
+
             DualPhaseRadioButton.IsEnabled = false;
             NumberOfRemainingGringTextBox.IsEnabled = false;
             GenerateButton.IsEnabled = false;
             AllGrainsBoundariesRadioButton.IsEnabled = false;
             NGrainsBoundariesRadioButton.IsEnabled = false;
-            NumberOfGrainsBoundariesTextBox.IsEnabled = false;
+            //NumberOfGrainsBoundariesTextBox.IsEnabled = false;
             ColorBoundariesButton.IsEnabled = false;
             ClearBackgroundButton.IsEnabled = false; 
         }
@@ -432,13 +459,15 @@ namespace MultiscaleModelling
             NeumannRadioButton.IsEnabled = true;
             MooreRadioButton.IsEnabled = true;
             ExtendedMooreRadioButton.IsEnabled = true;
-            GrowthProbabilityTextBox.IsEnabled = true;
+            //GrowthProbabilityTextBox.IsEnabled = true;
             EnableInclusionsCheckBox.IsEnabled = true;
         }
 
-        private void EnableCAStructureChanges()
+        private void EnableStructureChanges()
         {
             SubstructureRadioButton.IsEnabled = true;
+            AdvancedCARadioButton.IsEnabled = true;
+            //AdvancedMCRadioButton.IsEnabled = true;
             DualPhaseRadioButton.IsEnabled = true;
             NumberOfRemainingGringTextBox.IsEnabled = true;
             GenerateButton.IsEnabled = true;
@@ -452,6 +481,8 @@ namespace MultiscaleModelling
         private void DisableFirstPartOfStructureChanges()
         {
             SubstructureRadioButton.IsEnabled = false;
+            AdvancedCARadioButton.IsEnabled = false;
+            //AdvancedMCRadioButton.IsEnabled = false;
             DualPhaseRadioButton.IsEnabled = false;
             NumberOfRemainingGringTextBox.IsEnabled = false;
             GenerateButton.IsEnabled = false;
@@ -460,6 +491,8 @@ namespace MultiscaleModelling
         private void DisableCAStructureChanges()
         {
             SubstructureRadioButton.IsEnabled = false;
+            AdvancedCARadioButton.IsEnabled = false;
+            //AdvancedMCRadioButton.IsEnabled = false;
             DualPhaseRadioButton.IsEnabled = false;
             NumberOfRemainingGringTextBox.IsEnabled = false;
             GenerateButton.IsEnabled = false;
@@ -475,6 +508,8 @@ namespace MultiscaleModelling
             NumberOfMCStepsTextBox.IsEnabled = false;
             MCMooreRadioButton.IsEnabled = false;
             NumberOfInitialStatesTextBox.IsEnabled = false;
+
+            EnableSRXCheckBox.IsEnabled = false;
         }
 
         private void EnableMCBase()
@@ -484,15 +519,83 @@ namespace MultiscaleModelling
             NumberOfInitialStatesTextBox.IsEnabled = true;
         }
 
-        private void EnableMCStructureChanges()
-        {
-            
-        }
-
-        private void DisableMCStructureChanges()
+        private void EnableSRXCheckBox_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
+        private EnergyDistributionType ChooseEnergyDistributionType()
+        {
+            if (HeterogenousDistributionRadioButton.IsEnabled)
+            {
+                if (HeterogenousDistributionRadioButton.IsChecked == true)
+                {
+                    return EnergyDistributionType.Heterogenous;
+                }
+                else
+                {
+                    return EnergyDistributionType.Homogenous;
+                }
+            }
+            return EnergyDistributionType.Disabled;
+        }
+
+        private NucleationPosition ChooseNucleationPosition()
+        {
+            if (AnywhereNucleationRadioButton.IsEnabled)
+            {
+                if (AnywhereNucleationRadioButton.IsChecked == true)
+                {
+                    return NucleationPosition.Anywhere;
+                }
+                else
+                {
+                    return NucleationPosition.BC;
+                }
+            }
+            return NucleationPosition.Disabled;
+        }
+
+        private NucleationAmount ChooseNucleationAmount()
+        {
+            if (BeginingNucleationRadioButton.IsEnabled)
+            {
+                if (BeginingNucleationRadioButton.IsChecked == true)
+                {
+                    return NucleationAmount.Beginning;
+                }
+                else
+                {
+                    return NucleationAmount.Increasing;
+                }
+            }
+            return NucleationAmount.Disabled;
+        }
+
+        private void SetUpSRXPropertirs()
+        {
+            SRXProperties = new SRXProperties()
+            {
+                EnergyDistributionType = ChooseEnergyDistributionType(),
+                NucleationPosition = ChooseNucleationPosition(),
+                NucleationAmount = ChooseNucleationAmount()  
+            };
+        }
+
+        private void VisualizeEnerdyButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetUpSRXPropertirs();
+            SRX = new SRX(SRXProperties, currentScope);
+            currentScope = SRX.VisualizeEnergy();
+            StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+            previousScope = currentScope;
+        }
+
+        private void StartSRXButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetUpSRXPropertirs();
+            SRX = new SRX(SRXProperties, currentScope);
+
+        }
     }
 }

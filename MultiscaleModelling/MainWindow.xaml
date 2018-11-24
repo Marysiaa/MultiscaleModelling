@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiscaleModelling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1500">
+        Title="MainWindow" Height="900" Width="1500">
 
     <Border Padding="10">
         <StackPanel>
@@ -17,7 +17,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- PROPERTIES CA -->
-                <StackPanel Grid.Column="0" Height="950">
+                <StackPanel Grid.Column="0" Height="850">
                     <TextBlock Text="CA Properties" FontWeight="Bold" Margin="10"></TextBlock>
 
                     <!-- CLASS 1 -->
@@ -27,7 +27,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Number of grains" />
-                        <TextBox Grid.Column="1" Text="10" x:Name="NumberOfGrainsTextBox" Padding="5"/>
+                        <TextBox Grid.Column="1" Text="100" x:Name="NumberOfGrainsTextBox" Padding="5"/>
                     </Grid>
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
@@ -36,9 +36,9 @@
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Neighbourhood type"/>
                         <StackPanel Grid.Column="1" Margin="5">
-                            <RadioButton x:Name="NeumannRadioButton" Margin="2" IsChecked="false">Von Neumann</RadioButton>
+                            <RadioButton x:Name="NeumannRadioButton" Margin="2" IsChecked="True">Von Neumann</RadioButton>
                             <RadioButton x:Name="MooreRadioButton" Margin="2" IsChecked="False">Moore</RadioButton>
-                            <RadioButton x:Name="ExtendedMooreRadioButton" Margin="2" IsChecked="true">Extended Moore</RadioButton>
+                            <RadioButton x:Name="ExtendedMooreRadioButton" Margin="2" IsChecked="False">Extended Moore</RadioButton>
                         </StackPanel>
                     </Grid>
 
@@ -117,6 +117,25 @@
                         </StackPanel>
                     </Grid>
 
+                    <!-- space -->
+                    <StackPanel Height="80"></StackPanel>
+
+                    <!-- START -->
+                    <Grid Margin="15">
+                        <Button x:Name="StartButton" Click="StartButton_Click" Background="Beige" Width="120" Height="40">Start CA simulation</Button>
+                    </Grid>
+                </StackPanel>
+
+                <!-- IMAGE -->
+                <StackPanel Grid.Column="1">
+                    <!-- space -->
+                    <StackPanel Height="100"></StackPanel>
+
+                    <Image x:Name="StructureImage" Height="102" Width="102" Margin="10"/>
+
+                    <!-- space -->
+                    <StackPanel Height="150"></StackPanel>
+
                     <!-- CLASS 5 -->
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
@@ -125,10 +144,27 @@
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Structure"/>
                         <StackPanel Grid.Column="1" Margin="5">
-                            <RadioButton x:Name="SubstructureRadioButton" Margin="2" IsChecked="true" Click="BeginningRadioButton_Click" IsEnabled="False">Substructure</RadioButton>
-                            <RadioButton x:Name="DualPhaseRadioButton" Margin="2" IsChecked="false" Click="AterRadioButton_Click" IsEnabled="False">Dualphase</RadioButton>
+                            <RadioButton x:Name="SubstructureRadioButton" Margin="2" IsChecked="True" Click="BeginningRadioButton_Click" IsEnabled="False">Substructure</RadioButton>
+                            <RadioButton x:Name="DualPhaseRadioButton" Margin="2" IsChecked="False" Click="AterRadioButton_Click" IsEnabled="False">Dualphase</RadioButton>
                         </StackPanel>
                     </Grid>
+
+                    <!-- CLASS 9 -->
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Method"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="AdvancedCARadioButton" Margin="2" IsEnabled="False" IsChecked="True">CA</RadioButton>
+                            <RadioButton x:Name="AdvancedMCRadioButton" Margin="2" 
+                                         IsChecked="False" 
+                                         IsEnabled="{Binding ElementName=DualPhaseRadioButton, Path=IsChecked}">MC</RadioButton>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- CLASS 5 -->
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -173,16 +209,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- space -->
-                    <StackPanel Height="80">
-
-
-                    </StackPanel>
-
-                    <!-- START -->
-                    <Grid Margin="15">
-                        <Button x:Name="StartButton" Click="StartButton_Click" Background="Beige" Width="120" Height="40">Start CA simulation</Button>
-                    </Grid>
+                    <StackPanel Height="30"></StackPanel>
 
                     <!-- CLASS 2 -->
                     <Grid Margin="15">
@@ -204,12 +231,6 @@
                     <Grid Margin="15">
                         <Label x:Name="ResultLabel" Height="30"></Label>
                     </Grid>
-
-                </StackPanel>
-
-                <!-- IMAGE -->
-                <StackPanel Grid.Column="1">
-                    <Image x:Name="StructureImage" Height="152" Width="152" Margin="10"/>
                 </StackPanel>
 
                 <!-- PROPERTIES MC -->
@@ -244,21 +265,78 @@
                         <TextBox Grid.Column="1" Text="20" x:Name="NumberOfMCStepsTextBox" Padding="5"/>
                     </Grid>
 
-                    <!-- CLASS 9 -->
+                    <!-- CLASS 10 energy-->
                     <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" x:Name="EnableSRXCheckBox" Click="EnableSRXCheckBox_Click"
+                                      IsChecked="False" IsEnabled="False" Margin="5"></CheckBox>
+                            <Label Grid.Column="1">SRX</Label>
+                        </Grid>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Energy distribution type"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="HeterogenousDistributionRadioButton" Margin="2" IsChecked="true"
+                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Heterogenous</RadioButton>
+                            <RadioButton x:Name="HomogenousDistributionRadioButton" Margin="2" IsChecked="false"
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Homogenous</RadioButton>
+                            <Button x:Name="VisualizeEnerdyButton" Click="VisualizeEnerdyButton_Click"  Background="Beige"  Width="120" Height="20"
+                                    IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Visualize</Button>
+                        </StackPanel>
+                    </Grid>
+                    <!-- CLASS 11 nucleation-->
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Nucleation: position"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="AnywhereNucleationRadioButton" Margin="2" IsChecked="true"
+                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Anywhere</RadioButton>
+                            <RadioButton x:Name="GBNucleationRadioButton" Margin="2" IsChecked="false"
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">On grain boundaries</RadioButton>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Nucleation: amount"/>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <RadioButton x:Name="BeginingNucleationRadioButton" Margin="2" IsChecked="true"
+                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">All nucleons at the beginning</RadioButton>
+                            <RadioButton x:Name="IncreasingNucleationRadioButton" Margin="2" IsChecked="false"
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Increasing nucleation rate</RadioButton>
+                        </StackPanel>
+                    </Grid>
+                    <!-- CLASS 12 growth-->
+                    <Grid Margin="15">
+                            <Button x:Name="StartSRXButton" Click="StartSRXButton_Click"  Background="Beige"  Width="120" Height="20"
+                                    IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Strat SRX</Button>
                     </Grid>
 
                     <!-- space -->
-                    <StackPanel Height="80">
-
-
-                    </StackPanel>
+                    <StackPanel Height="70"></StackPanel>
 
                     <!-- START -->
                     <Grid Margin="15">
                         <Button x:Name="MCStartButton" Click="MCStartButton_Click" Background="Beige" Width="120" Height="40">Start MC simulation</Button>
                     </Grid>
-                    
+
                 </StackPanel>
             </Grid>
         </StackPanel>

@@ -25,7 +25,7 @@ namespace MultiscaleModelling.MonteCarlo
             ItertionsPerformed = 0;
         }
 
-        public Scope Grow(Scope scope)
+        public Scope Grow(Scope scope, List<int> remainingIds = null)
         {
             var remainingCellsForIteration = new List<KeyValuePair<Point, Grain>>();
 
@@ -34,7 +34,7 @@ namespace MultiscaleModelling.MonteCarlo
             {
                 for (int j = 1; j < scope.Height - 1; j++)
                 {
-                    if (CanGrainChangeState(i, j, scope.StructureArray))
+                    if (CanGrainChangeState(i, j, scope.StructureArray, remainingIds))
                     {
                         remainingCellsForIteration.Add(new KeyValuePair<Point, Grain>(new Point(i, j), scope.StructureArray[i, j]));
                     }
@@ -68,7 +68,6 @@ namespace MultiscaleModelling.MonteCarlo
             return scope;
         }
 
-
         private int GetRandomCell(int min, int max)
         {
             return random.Next(min, max);
@@ -79,10 +78,22 @@ namespace MultiscaleModelling.MonteCarlo
             return states.ElementAt(random.Next(0, states.Count()));
         }
 
-        private bool CanGrainChangeState(int i, int j, Grain[,] structureArray)
+        private bool CanGrainChangeState(int i, int j, Grain[,] structureArray, List<int> remainingIds)
         {
-            var neighbourhood = TakeMooreNeighbourhood(i, j, structureArray);
-            var groups = neighbourhood.Where(g => (!StructureHelpers.IsIdSpecial(g.Id) && g.Id == structureArray[i, j].Id)).GroupBy(g => g.Id);
+            var neighbourhood = StructureHelpers.TakeMooreNeighbourhood(i, j, structureArray);
+
+            IEnumerable<IGrouping<int, Grain>> groups = null;
+            if (remainingIds != null && remainingIds.Count() > 0)
+            {
+                groups = neighbourhood
+                    .Where(g => (!StructureHelpers.IsIdSpecial(g.Id)) && !remainingIds.Any(id => id.Equals(g.Id) && g.Id == structureArray[i, j].Id))
+                    .GroupBy(g => g.Id);
+            }
+            else
+            {
+                groups = neighbourhood.Where(g => (!StructureHelpers.IsIdSpecial(g.Id) && g.Id == structureArray[i, j].Id)).GroupBy(g => g.Id);
+            }
+
             if (groups.Any())
             {
                 var dictionary = new Dictionary<Grain, int>();
@@ -106,25 +117,9 @@ namespace MultiscaleModelling.MonteCarlo
             }
         }
 
-        private List<Grain> TakeMooreNeighbourhood(int i, int j, Grain[,] structureArray)
-        {
-            var neighbourhood = new List<Grain>
-            {
-                structureArray[i - 1, j],
-                structureArray[i + 1, j],
-                structureArray[i, j - 1],
-                structureArray[i, j + 1],
-                structureArray[i - 1, j - 1],
-                structureArray[i - 1, j + 1],
-                structureArray[i + 1, j - 1],
-                structureArray[i + 1, j + 1]
-            };
-            return neighbourhood;
-        }
-
         private bool IsStateChangeAcceptable(Point point, Grain[,] structureArray, Grain newState)
         {
-            var neighbourhood = TakeMooreNeighbourhood(point.X, point.Y, structureArray);
+            var neighbourhood = StructureHelpers.TakeMooreNeighbourhood(point.X, point.Y, structureArray);
             int previousEnergy = neighbourhood.Where(g => (g.Id != 0 && g.Id != structureArray[point.X, point.Y].Id)).Count();
             int newEnergy = neighbourhood.Where(g => (g.Id != 0 && g.Id != newState.Id)).Count();
             if (newEnergy - previousEnergy <= 0)

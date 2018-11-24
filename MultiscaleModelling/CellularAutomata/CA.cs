@@ -33,7 +33,6 @@ namespace MultiscaleModelling.CellularAutomata
                     {
                         currentStructure.StructureArray[i, j] = previousStructure.StructureArray[i, j];
                     }
-
                     else if (previousStructure.StructureArray[i, j].Id == 0)
                     {
                         if (!isGrowthExtended)
@@ -84,8 +83,8 @@ namespace MultiscaleModelling.CellularAutomata
                         }
                         else
                         {
-                            var dictionary = new Dictionary<Grain, int>();
                             var grainGrowth = false;
+                            var dictionary = new Dictionary<Grain, int>();
                             // rule 1
                             neighbourhood = TakeMooreNeighbourhood(i, j, previousStructure.StructureArray);
                             IEnumerable<IGrouping<int, Grain>> groups = null;
@@ -201,7 +200,9 @@ namespace MultiscaleModelling.CellularAutomata
                     }
 
                     if (currentStructure.StructureArray[i, j].Id == 0)
+                    {
                         isFull = false;
+                    }
                 }
             }
 

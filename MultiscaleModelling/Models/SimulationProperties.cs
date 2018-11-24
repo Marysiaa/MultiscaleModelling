@@ -16,6 +16,8 @@
 
         public StructureType StructureType { get; set; }
 
+        public AdvancedMethodType AdvancedMethodType { get; set; }
+
         public int? NumberOfRemainingGrains { get; set; }
 
         public GrainBoundariesProperties GrainBoundariesProperties { get; set; }
@@ -23,7 +25,9 @@
 
     public enum NeighbourhoodType { Neumann = 0, Moore = 1, ExtendedMoore = 2 }
 
-    public enum SpecialIds { Empty = 0, Border = -1, Inclusion = -2, SecondPhase = -3, Boundaries = -4 }
+    public enum SpecialIds { Empty = 0, Border = -1, Inclusion = -2, SecondPhase = -3, Boundaries = -4, Energy = -5 }
 
     public enum StructureType { Disabled = -1, Substructure = 0, Dualphase = 1 }
+
+    public enum AdvancedMethodType { Disabled = -1, AdvancedCA = 0, AdvancedMC = 1 }
 }

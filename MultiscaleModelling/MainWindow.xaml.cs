@@ -29,6 +29,7 @@ namespace MultiscaleModelling
 
         private SRX SRX;
         private SRXProperties SRXProperties;
+        private bool SRXSelected = false;
 
         public MainWindow()
         {
@@ -47,7 +48,7 @@ namespace MultiscaleModelling
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (!MCSelected && (currentScope == null || !currentScope.IsFull))
+            if (!MCSelected && !SRXSelected && (currentScope == null || !currentScope.IsFull))
             {
                 currentScope = CA.Grow(previousScope, properties.NeighbourhoodType, properties.GrowthProbability);
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
@@ -59,19 +60,32 @@ namespace MultiscaleModelling
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                 previousScope = currentScope;
             }
+            else if (SRXSelected && !MCSelected && (currentScope == null || !currentScope.IsFull) && SRX != null)
+            {
+                currentScope = SRX.GrowthNucleons(currentScope, previousScope);
+                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                previousScope = currentScope;
+            }
             else
             {
-                if (!MCSelected)
+                if (!MCSelected && !SRXSelected)
                 {
                     EnableStructureChanges();
                     EnableMCBase();
                 }
-                if (MCSelected)
+                if (MCSelected && !SRXSelected)
                 {
                     EnableStructureChanges();
                     SubstructureRadioButton.IsEnabled = false;
                     EnableCABase();
                     EnableSRXCheckBox.IsEnabled = true;
+                }
+                if (SRXSelected)
+                {
+                    DisableCA();
+                    DisableMC();
+                    StartSRXButton.IsEnabled = false;
+                    EnableSRXCheckBox.IsEnabled = false;
                 }
                 DispatcherTimer timer = (DispatcherTimer)sender;
                 timer.Stop();
@@ -81,6 +95,7 @@ namespace MultiscaleModelling
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             MCSelected = false;
+            SRXSelected = false;
             DisableMC();
             DisableCAStructureChanges();
 
@@ -395,7 +410,7 @@ namespace MultiscaleModelling
 
             ClearBackgroundButton.IsEnabled = false;
         }
-        
+
         private void SetUpMCProperties()
         {
             MCproperties = new MCProperties()
@@ -409,11 +424,12 @@ namespace MultiscaleModelling
         private void MCStartButton_Click(object sender, RoutedEventArgs e)
         {
             MCSelected = true;
+            SRXSelected = false;
             DisableCA();
 
             previousScope = null;
             currentScope = null;
-            
+
             SetUpMCProperties();
             this.MC = new MC(random, MCproperties);
 
@@ -450,7 +466,7 @@ namespace MultiscaleModelling
             NGrainsBoundariesRadioButton.IsEnabled = false;
             //NumberOfGrainsBoundariesTextBox.IsEnabled = false;
             ColorBoundariesButton.IsEnabled = false;
-            ClearBackgroundButton.IsEnabled = false; 
+            ClearBackgroundButton.IsEnabled = false;
         }
 
         private void EnableCABase()
@@ -542,9 +558,9 @@ namespace MultiscaleModelling
 
         private NucleationPosition ChooseNucleationPosition()
         {
-            if (AnywhereNucleationRadioButton.IsEnabled)
+            if (HomogenousDistributionRadioButton.IsEnabled) //AnywhereNucleationRadioButton.IsEnabled)
             {
-                if (AnywhereNucleationRadioButton.IsChecked == true)
+                if (HomogenousDistributionRadioButton.IsChecked == true)
                 {
                     return NucleationPosition.Anywhere;
                 }
@@ -578,7 +594,9 @@ namespace MultiscaleModelling
             {
                 EnergyDistributionType = ChooseEnergyDistributionType(),
                 NucleationPosition = ChooseNucleationPosition(),
-                NucleationAmount = ChooseNucleationAmount()  
+                NucleationAmount = ChooseNucleationAmount(),
+                GrainEnergy = Converters.StringToInt(GrainEnergyTextBox.Text),
+                BoundaryEnergy = Converters.StringToInt(BoundaryEnergyTextBox.Text)
             };
         }
 
@@ -589,13 +607,31 @@ namespace MultiscaleModelling
             currentScope = SRX.VisualizeEnergy();
             StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
             previousScope = currentScope;
+
+            EnableXRStart();
+        }
+
+        private void EnableXRStart()
+        {
+            BeginingNucleationRadioButton.IsEnabled = true;
+            IncreasingNucleationRadioButton.IsEnabled = true;
+            StartSRXButton.IsEnabled = true;
         }
 
         private void StartSRXButton_Click(object sender, RoutedEventArgs e)
         {
-            SetUpSRXPropertirs();
-            SRX = new SRX(SRXProperties, currentScope);
+            MCSelected = false;
+            SRXSelected = true;
+            DisableCA();
+            DisableMC();
 
+            SetUpSRXPropertirs();
+            this.SRX = new SRX(SRXProperties, currentScope);
+
+            previousScope = currentScope;
+            currentScope.IsFull = false;
+
+            dispatcherTimer.Start();
         }
     }
 }

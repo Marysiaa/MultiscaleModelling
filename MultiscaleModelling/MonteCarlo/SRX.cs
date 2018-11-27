@@ -17,15 +17,8 @@ namespace MultiscaleModelling.MonteCarlo
         private Color energy0 { get; set; }
         private Color energy1 { get; set; }
         private Color energy2 { get; set; }
-        private Color energy3 { get; set; }
-        private Color energy4 { get; set; }
-        private Color energy5 { get; set; }
-        private Color energy6 { get; set; }
-        private Color energy7 { get; set; }
-        private Color energy8 { get; set; }
         private Color energyOther { get; set; }
 
-        // to do
         public SRX(SRXProperties SRXProperties, Scope scope)
         {
             this.SRXProperties = SRXProperties;
@@ -36,33 +29,13 @@ namespace MultiscaleModelling.MonteCarlo
 
         public Scope VisualizeEnergy()
         {
-            switch (SRXProperties.EnergyDistributionType)
-            {
-                case EnergyDistributionType.Heterogenous:
-                    return HeterogenousDistrbution();
-                case EnergyDistributionType.Homogenous:
-                    return HomogenousDistribution();
-                default:
-                    return null;
-            }
-        }
-
-        // to do
-        public Scope GrowthNucleons()
-        {
-            throw new NotImplementedException();
-        }
-
-        // to do
-        private Scope HeterogenousDistrbution()
-        {
             return EnergyDistribution();
         }
 
         // to do
-        private Scope HomogenousDistribution()
+        public Scope GrowthNucleons(Scope currentScope, Scope previousScope)
         {
-            return EnergyDistribution();
+            return currentScope;
         }
 
         private Scope EnergyDistribution()
@@ -73,24 +46,21 @@ namespace MultiscaleModelling.MonteCarlo
             {
                 for (int j = 1; j < scope.Height - 1; j++)
                 {
-                    if (scope.StructureArray[i, j].Id != Convert.ToInt32(SpecialIds.Boundaries))
+                    if (scope.StructureArray[i, j].Id != Convert.ToInt32(SpecialIds.Border))
                     {
                         energyScope.StructureArray[i, j].Id = Convert.ToInt32(SpecialIds.Energy);
-                        // calculate energy
-                        var neighbourhood = StructureHelpers.TakeMooreNeighbourhood(i, j, scope.StructureArray);
-                        int energy = neighbourhood.Where(g => (!StructureHelpers.IsIdSpecial(g.Id) && g.Id != scope.StructureArray[i, j].Id)).Count();
-                        int specials = neighbourhood.Where(g => StructureHelpers.IsIdSpecial(g.Id)).Count();
-                        if (specials > 0 && energy > 0)
-                        {
-                            //energy += specials / 2;
-                        }
-                        energyScope.StructureArray[i, j].Color = ChooseColor(energy);
+                        energyScope.StructureArray[i, j].Energy = SRXProperties.GrainEnergy;
+                        energyScope.StructureArray[i, j].Color = ChooseColor(SRXProperties.GrainEnergy);
                     }
                     else
                     {
-                        energyScope.StructureArray[i, j].Id = scope.StructureArray[i, j].Id;
+                        energyScope.StructureArray[i, j] = scope.StructureArray[i, j];
                     }
                 }
+            }
+            if (SRXProperties.EnergyDistributionType == EnergyDistributionType.Heterogenous)
+            {
+                UpdateBoundariesEnergy(scope, energyScope);
             }
 
             energyScope.IsFull = true;
@@ -101,33 +71,49 @@ namespace MultiscaleModelling.MonteCarlo
 
         private Color ChooseColor(int energy)
         {
-            switch (energy)
-            {
-                case 0: return energy0;
-                case 1: return energy1;
-                case 2: return energy2;
-                case 3: return energy3;
-                case 4: return energy4;
-                case 5: return energy5;
-                case 6: return energy6;
-                case 7: return energy7;
-                case 8: return energy8;
-                default: return energyOther;
-            }
+            if (energy == 0)
+                return energy0;
+            else if (energy <= 5)
+                return energy1;
+            else if (energy > 5)
+                return energy2;
+            return energyOther;
         }
 
         private void SetUpColors()
         {
-            this.energy0 = Color.RoyalBlue;
-            this.energy1 = Color.DodgerBlue;
-            this.energy2 = Color.Aquamarine;
-            this.energy3 = Color.CornflowerBlue;
-            this.energy4 = Color.RoyalBlue;
-            this.energy5 = Color.PaleVioletRed;
-            this.energy6 = Color.IndianRed;
-            this.energy7 = Color.Crimson;
-            this.energy8 = Color.DarkRed;
+            this.energy0 = Color.Blue;
+            this.energy1 = Color.YellowGreen;
+            this.energy2 = Color.Red;
             this.energyOther = Color.FloralWhite;
+        }
+
+        private void UpdateBoundariesEnergy(Scope baseScope, Scope energyScope)
+        {
+            for (int i = 2; i < baseScope.Width - 2; i++)
+            {
+                for (int j = 2; j < baseScope.Height - 2; j++)
+                {
+                    if (((baseScope.StructureArray[i, j].Id != baseScope.StructureArray[i + 1, j].Id
+                        && !StructureHelpers.IsIdSpecial(baseScope.StructureArray[i + 1, j].Id))
+                        || (baseScope.StructureArray[i, j].Id != baseScope.StructureArray[i - 1, j].Id
+                        && !StructureHelpers.IsIdSpecial(baseScope.StructureArray[i - 1, j].Id)))
+                        && !StructureHelpers.IsIdSpecial(baseScope.StructureArray[i, j].Id))
+                    {
+                        energyScope.StructureArray[i, j].Color = ChooseColor(SRXProperties.BoundaryEnergy.Value);
+                        energyScope.StructureArray[i, j].Energy = SRXProperties.BoundaryEnergy.Value;
+                    }
+                    if (((baseScope.StructureArray[i, j].Id != baseScope.StructureArray[i, j + 1].Id
+                        && !StructureHelpers.IsIdSpecial(baseScope.StructureArray[i, j + 1].Id))
+                        || (baseScope.StructureArray[i, j].Id != baseScope.StructureArray[i, j - 1].Id
+                        && !StructureHelpers.IsIdSpecial(baseScope.StructureArray[i, j - 1].Id)))
+                        && !StructureHelpers.IsIdSpecial(baseScope.StructureArray[i, j].Id))
+                    {
+                        energyScope.StructureArray[i, j].Color = ChooseColor(SRXProperties.BoundaryEnergy.Value);
+                        energyScope.StructureArray[i, j].Energy = SRXProperties.BoundaryEnergy.Value;
+                    }
+                }
+            }
         }
     }
 }

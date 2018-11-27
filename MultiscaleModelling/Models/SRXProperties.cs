@@ -10,6 +10,10 @@ namespace MultiscaleModelling.Models
     {
         public EnergyDistributionType EnergyDistributionType { get; set; }
 
+        public int GrainEnergy { get; set; }
+
+        public int? BoundaryEnergy { get; set; }
+
         public NucleationPosition NucleationPosition { get; set; }
 
         public NucleationAmount NucleationAmount { get; set; }

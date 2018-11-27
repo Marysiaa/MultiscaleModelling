@@ -12,5 +12,7 @@ namespace MultiscaleModelling.Models
         public int Id { get; set; }
 
         public Color Color { get; set; }
+
+        public int Energy { get; set; } = -1;
     }
 }

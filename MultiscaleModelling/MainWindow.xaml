@@ -129,12 +129,12 @@
                 <!-- IMAGE -->
                 <StackPanel Grid.Column="1">
                     <!-- space -->
-                    <StackPanel Height="100"></StackPanel>
+                    <StackPanel Height="10"></StackPanel>
 
-                    <Image x:Name="StructureImage" Height="102" Width="102" Margin="10"/>
+                    <Image x:Name="StructureImage" Height="202" Width="202" Margin="10"/>
 
                     <!-- space -->
-                    <StackPanel Height="150"></StackPanel>
+                    <StackPanel Height="10"></StackPanel>
 
                     <!-- CLASS 5 -->
                     <Grid Margin="5">
@@ -268,9 +268,9 @@
                     <!-- CLASS 10 energy-->
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -288,16 +288,36 @@
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Energy distribution type"/>
                         <StackPanel Grid.Column="1" Margin="5">
-                            <RadioButton x:Name="HeterogenousDistributionRadioButton" Margin="2" IsChecked="true"
-                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Heterogenous</RadioButton>
-                            <RadioButton x:Name="HomogenousDistributionRadioButton" Margin="2" IsChecked="false"
+                            <RadioButton x:Name="HomogenousDistributionRadioButton" Margin="2" IsChecked="True"
                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Homogenous</RadioButton>
-                            <Button x:Name="VisualizeEnerdyButton" Click="VisualizeEnerdyButton_Click"  Background="Beige"  Width="120" Height="20"
-                                    IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Visualize</Button>
+                            <RadioButton x:Name="HeterogenousDistributionRadioButton" Margin="2" IsChecked="False"
+                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Heterogenous</RadioButton>
                         </StackPanel>
                     </Grid>
-                    <!-- CLASS 11 nucleation-->
                     <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <Label Content="Grain energy" />
+                            <Label Content="Boundary energy" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <StackPanel>
+                                <TextBox Grid.Column="5" Text="5" x:Name="GrainEnergyTextBox" Padding="5"
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}"/>
+                                <TextBox Grid.Column="10" Text="10" x:Name="BoundaryEnergyTextBox" Padding="5"
+                                         IsEnabled="{Binding ElementName=HeterogenousDistributionRadioButton, Path=IsChecked}"/>
+                                
+                                <Button x:Name="VisualizeEnerdyButton" Click="VisualizeEnerdyButton_Click"  Background="Beige"  Width="120" Height="20"
+                                    IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Visualize</Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <!-- CLASS 11 nucleation-->
+                    <!--<Grid Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="2*" />
@@ -309,7 +329,7 @@
                             <RadioButton x:Name="GBNucleationRadioButton" Margin="2" IsChecked="false"
                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">On grain boundaries</RadioButton>
                         </StackPanel>
-                    </Grid>
+                    </Grid>-->
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" />
@@ -318,15 +338,15 @@
                         <Label Grid.Column="0" Content="Nucleation: amount"/>
                         <StackPanel Grid.Column="1" Margin="5">
                             <RadioButton x:Name="BeginingNucleationRadioButton" Margin="2" IsChecked="true"
-                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">All nucleons at the beginning</RadioButton>
+                                          IsEnabled="False">All nucleons at the beginning</RadioButton>
                             <RadioButton x:Name="IncreasingNucleationRadioButton" Margin="2" IsChecked="false"
-                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Increasing nucleation rate</RadioButton>
+                                         IsEnabled="False">Increasing nucleation rate</RadioButton>
                         </StackPanel>
                     </Grid>
                     <!-- CLASS 12 growth-->
                     <Grid Margin="15">
-                            <Button x:Name="StartSRXButton" Click="StartSRXButton_Click"  Background="Beige"  Width="120" Height="20"
-                                    IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Strat SRX</Button>
+                        <Button x:Name="StartSRXButton" Click="StartSRXButton_Click"  Background="Beige"  Width="120" Height="20"
+                                    IsEnabled="False">Strat SRX</Button>
                     </Grid>
 
                     <!-- space -->

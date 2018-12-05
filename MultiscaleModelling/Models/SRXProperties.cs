@@ -13,16 +13,18 @@ namespace MultiscaleModelling.Models
         public int GrainEnergy { get; set; }
 
         public int? BoundaryEnergy { get; set; }
+        
+        public NucleationDistribution NucleationDistribution { get; set; }
 
-        public NucleationPosition NucleationPosition { get; set; }
+        public int Steps { get; set; }
 
-        public NucleationAmount NucleationAmount { get; set; }
+        public int States { get; set; }
+
+        public int Nucleons { get; set; }
     }
 
     public enum EnergyDistributionType { Disabled = -1, Heterogenous = 0, Homogenous = 1 }
-
-    public enum NucleationPosition { Disabled = -1, Anywhere = 0, BC = 1 }
-
-    public enum NucleationAmount { Disabled = -1, Beginning = 0, Increasing = 1 }
+   
+    public enum NucleationDistribution { Disabled = -1, Beginning = 0, Constant = 1, Increasing = 2 }
 
 }

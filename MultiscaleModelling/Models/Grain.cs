@@ -14,5 +14,7 @@ namespace MultiscaleModelling.Models
         public Color Color { get; set; }
 
         public int Energy { get; set; } = -1;
+
+        public bool IsRecrystalized { get; set; } = false;
     }
 }

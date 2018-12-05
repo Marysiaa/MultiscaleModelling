@@ -30,6 +30,7 @@ namespace MultiscaleModelling
         private SRX SRX;
         private SRXProperties SRXProperties;
         private bool SRXSelected = false;
+        private Scope energyScope;
 
         public MainWindow()
         {
@@ -60,11 +61,14 @@ namespace MultiscaleModelling
                 StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
                 previousScope = currentScope;
             }
-            else if (SRXSelected && !MCSelected && (currentScope == null || !currentScope.IsFull) && SRX != null)
+            else if (SRXSelected && !MCSelected && (currentScope == null || !currentScope.IsFull) && SRX != null && SRX.ItertionsPerformed < SRXProperties.Steps)
             {
-                currentScope = SRX.GrowthNucleons(currentScope, previousScope);
-                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                var scopes = SRX.GrowthNucleons(currentScope, energyScope);
+                currentScope = scopes[0];
+                energyScope = scopes[1];
                 previousScope = currentScope;
+                StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                EnergyImage.Source = Converters.BitmapToImageSource(energyScope.StructureBitmap);
             }
             else
             {
@@ -86,6 +90,7 @@ namespace MultiscaleModelling
                     DisableMC();
                     StartSRXButton.IsEnabled = false;
                     EnableSRXCheckBox.IsEnabled = false;
+                    ResultLabel.Content = "SRX finished";
                 }
                 DispatcherTimer timer = (DispatcherTimer)sender;
                 timer.Stop();
@@ -194,6 +199,8 @@ namespace MultiscaleModelling
                 if (currentScope != null)
                 {
                     StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+                    EnergyImage.Source = null;
+                    energyScope = null;
                     ResultLabel.Content = "File read result: structure uploaded";
                     if (EnableInclusionsCheckBox.IsEnabled)
                     {
@@ -556,36 +563,23 @@ namespace MultiscaleModelling
             return EnergyDistributionType.Disabled;
         }
 
-        private NucleationPosition ChooseNucleationPosition()
-        {
-            if (HomogenousDistributionRadioButton.IsEnabled) //AnywhereNucleationRadioButton.IsEnabled)
-            {
-                if (HomogenousDistributionRadioButton.IsChecked == true)
-                {
-                    return NucleationPosition.Anywhere;
-                }
-                else
-                {
-                    return NucleationPosition.BC;
-                }
-            }
-            return NucleationPosition.Disabled;
-        }
-
-        private NucleationAmount ChooseNucleationAmount()
+        private NucleationDistribution ChooseNucleationAmount()
         {
             if (BeginingNucleationRadioButton.IsEnabled)
             {
                 if (BeginingNucleationRadioButton.IsChecked == true)
                 {
-                    return NucleationAmount.Beginning;
+                    return NucleationDistribution.Beginning;
                 }
-                else
+                else if (ConstantNucleationRadioButton.IsChecked == true)
                 {
-                    return NucleationAmount.Increasing;
+                    return NucleationDistribution.Constant;
+                }
+                else{
+                    return NucleationDistribution.Increasing;
                 }
             }
-            return NucleationAmount.Disabled;
+            return NucleationDistribution.Disabled;
         }
 
         private void SetUpSRXPropertirs()
@@ -593,21 +587,25 @@ namespace MultiscaleModelling
             SRXProperties = new SRXProperties()
             {
                 EnergyDistributionType = ChooseEnergyDistributionType(),
-                NucleationPosition = ChooseNucleationPosition(),
-                NucleationAmount = ChooseNucleationAmount(),
+                NucleationDistribution = ChooseNucleationAmount(),
                 GrainEnergy = Converters.StringToInt(GrainEnergyTextBox.Text),
-                BoundaryEnergy = Converters.StringToInt(BoundaryEnergyTextBox.Text)
+                BoundaryEnergy = Converters.StringToInt(BoundaryEnergyTextBox.Text),
+                Nucleons = Converters.StringToInt(SRXNucleonsTextBox.Text),
+                States = Converters.StringToInt(SRXStatesTextBox.Text),
+                Steps = Converters.StringToInt(SRXStepsTextBox.Text)
             };
         }
 
         private void VisualizeEnerdyButton_Click(object sender, RoutedEventArgs e)
         {
             SetUpSRXPropertirs();
-            SRX = new SRX(SRXProperties, currentScope);
-            currentScope = SRX.VisualizeEnergy();
-            StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
+            SRX = new SRX(random, SRXProperties, currentScope, false);
+            var scopes = SRX.VisualizeEnergy();
+            energyScope = scopes[0];
+            currentScope = scopes[1];
             previousScope = currentScope;
-
+            EnergyImage.Source = Converters.BitmapToImageSource(energyScope.StructureBitmap);
+            StructureImage.Source = Converters.BitmapToImageSource(currentScope.StructureBitmap);
             EnableXRStart();
         }
 
@@ -626,7 +624,7 @@ namespace MultiscaleModelling
             DisableMC();
 
             SetUpSRXPropertirs();
-            this.SRX = new SRX(SRXProperties, currentScope);
+            this.SRX = new SRX(random, SRXProperties, currentScope, true);
 
             previousScope = currentScope;
             currentScope.IsFull = false;

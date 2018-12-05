@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiscaleModelling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1500">
+        Title="MainWindow" Height="1000" Width="1500">
 
     <Border Padding="10">
         <StackPanel>
@@ -17,7 +17,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- PROPERTIES CA -->
-                <StackPanel Grid.Column="0" Height="850">
+                <StackPanel Grid.Column="0" Height="950">
                     <TextBlock Text="CA Properties" FontWeight="Bold" Margin="10"></TextBlock>
 
                     <!-- CLASS 1 -->
@@ -132,7 +132,8 @@
                     <StackPanel Height="10"></StackPanel>
 
                     <Image x:Name="StructureImage" Height="202" Width="202" Margin="10"/>
-
+                    <Image x:Name="EnergyImage" Height="202" Width="202" Margin="10"/>
+                    
                     <!-- space -->
                     <StackPanel Height="10"></StackPanel>
 
@@ -338,12 +339,36 @@
                         <Label Grid.Column="0" Content="Nucleation: amount"/>
                         <StackPanel Grid.Column="1" Margin="5">
                             <RadioButton x:Name="BeginingNucleationRadioButton" Margin="2" IsChecked="true"
-                                          IsEnabled="False">All nucleons at the beginning</RadioButton>
+                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">All nucleons at the beginning</RadioButton>
+                            <RadioButton x:Name="ConstantNucleationRadioButton" Margin="2" IsChecked="False"
+                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Costant nucletaion rate</RadioButton>
                             <RadioButton x:Name="IncreasingNucleationRadioButton" Margin="2" IsChecked="false"
-                                         IsEnabled="False">Increasing nucleation rate</RadioButton>
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Increasing nucleation rate</RadioButton>
                         </StackPanel>
                     </Grid>
+                    
                     <!-- CLASS 12 growth-->
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <Label Content="Number of steps" />
+                            <Label Content="Number of nucleons" />
+                            <Label Content="Number of avaliable states" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <StackPanel>
+                                <TextBox Text="20" x:Name="SRXStepsTextBox" Padding="5"
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}"/>
+                                <TextBox Text="100" x:Name="SRXNucleonsTextBox" Padding="5"
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}"/>
+                                <TextBox Text="4" x:Name="SRXStatesTextBox" Padding="5"
+                                         IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
                     <Grid Margin="15">
                         <Button x:Name="StartSRXButton" Click="StartSRXButton_Click"  Background="Beige"  Width="120" Height="20"
                                     IsEnabled="False">Strat SRX</Button>

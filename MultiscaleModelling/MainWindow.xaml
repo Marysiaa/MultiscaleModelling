@@ -124,6 +124,29 @@
                     <Grid Margin="15">
                         <Button x:Name="StartButton" Click="StartButton_Click" Background="Beige" Width="120" Height="40">Start CA simulation</Button>
                     </Grid>
+
+                    <StackPanel Height="30"></StackPanel>
+
+                    <!-- CLASS 2 -->
+                    <Grid Margin="15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <!-- SAVE FILE -->
+                        <StackPanel Grid.Column="0">
+                            <Button x:Name="SaveTxtButton" Click="SaveTxtButton_Click"  Background="Beige"  Width="120" Height="20">Save txt file</Button>
+                            <Button x:Name="SaveBitmapButton" Click="SaveBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Save bitmap</Button>
+                        </StackPanel>
+                        <!-- READ FILE -->
+                        <StackPanel  Grid.Column="1">
+                            <Button x:Name="ReadTxtButton" Click="ReadTxtButton_Click"  Background="Beige"  Width="120" Height="20">Read txt file</Button>
+                            <Button x:Name="ReadBitmapButton" Click="ReadBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Read bitmap</Button>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="15">
+                        <Label x:Name="ResultLabel" Height="30"></Label>
+                    </Grid>
                 </StackPanel>
 
                 <!-- IMAGE -->
@@ -133,7 +156,7 @@
 
                     <Image x:Name="StructureImage" Height="202" Width="202" Margin="10"/>
                     <Image x:Name="EnergyImage" Height="202" Width="202" Margin="10"/>
-                    
+
                     <!-- space -->
                     <StackPanel Height="10"></StackPanel>
 
@@ -208,29 +231,6 @@
                             <Button x:Name="ClearBackgroundButton" Click="ClearBackgroundButton_Click"  Background="Beige"  Width="120" Height="20" 
                                     IsEnabled="False">Clear background</Button>
                         </StackPanel>
-                    </Grid>
-
-                    <StackPanel Height="30"></StackPanel>
-
-                    <!-- CLASS 2 -->
-                    <Grid Margin="15">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <!-- SAVE FILE -->
-                        <StackPanel Grid.Column="0">
-                            <Button x:Name="SaveTxtButton" Click="SaveTxtButton_Click"  Background="Beige"  Width="120" Height="20">Save txt file</Button>
-                            <Button x:Name="SaveBitmapButton" Click="SaveBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Save bitmap</Button>
-                        </StackPanel>
-                        <!-- READ FILE -->
-                        <StackPanel  Grid.Column="1">
-                            <Button x:Name="ReadTxtButton" Click="ReadTxtButton_Click"  Background="Beige"  Width="120" Height="20">Read txt file</Button>
-                            <Button x:Name="ReadBitmapButton" Click="ReadBitmapButton_Click"  Background="Beige"  Width="120" Height="20">Read bitmap</Button>
-                        </StackPanel>
-                    </Grid>
-                    <Grid Margin="15">
-                        <Label x:Name="ResultLabel" Height="30"></Label>
                     </Grid>
                 </StackPanel>
 
@@ -310,13 +310,13 @@
                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}"/>
                                 <TextBox Grid.Column="10" Text="10" x:Name="BoundaryEnergyTextBox" Padding="5"
                                          IsEnabled="{Binding ElementName=HeterogenousDistributionRadioButton, Path=IsChecked}"/>
-                                
+
                                 <Button x:Name="VisualizeEnerdyButton" Click="VisualizeEnerdyButton_Click"  Background="Beige"  Width="120" Height="20"
                                     IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Visualize</Button>
                             </StackPanel>
                         </StackPanel>
                     </Grid>
-                    
+
                     <!-- CLASS 11 nucleation-->
                     <!--<Grid Margin="5">
                         <Grid.ColumnDefinitions>
@@ -346,7 +346,7 @@
                                          IsEnabled="{Binding ElementName=EnableSRXCheckBox, Path=IsChecked}">Increasing nucleation rate</RadioButton>
                         </StackPanel>
                     </Grid>
-                    
+
                     <!-- CLASS 12 growth-->
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
@@ -370,10 +370,12 @@
                         </StackPanel>
                     </Grid>
                     <Grid Margin="15">
-                        <Button x:Name="StartSRXButton" Click="StartSRXButton_Click"  Background="Beige"  Width="120" Height="20"
-                                    IsEnabled="False">Strat SRX</Button>
+                        <StackPanel>
+                            <Button x:Name="StartSRXButton" Click="StartSRXButton_Click"  Background="Beige"  Width="120" Height="20"
+                                    IsEnabled="False">Start SRX</Button>
+                            <Label x:Name="SRXResultLabel" Height="30"></Label>
+                        </StackPanel>
                     </Grid>
-
                     <!-- space -->
                     <StackPanel Height="70"></StackPanel>
 

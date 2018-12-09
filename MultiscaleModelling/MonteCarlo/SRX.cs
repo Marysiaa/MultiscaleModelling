@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiscaleModelling.MonteCarlo
 {
@@ -284,11 +282,29 @@ namespace MultiscaleModelling.MonteCarlo
                     }
                     return nucleonsPerIteration;
                 case NucleationDistribution.Increasing:
-                    // to do
-                    var temp = properties.Nucleons / properties.Steps;
-                    for (int i = 0; i < properties.Steps; i++)
+                    var r = 10;
+                    var n = properties.Steps;
+                    var Sn = properties.Nucleons;
+                    var a1 = 10;
+                    if (properties.Nucleons < 10)
                     {
-                        nucleonsPerIteration.Add(temp);
+                        a1 = properties.Nucleons;
+                    }
+                    var an = a1;
+                    nucleonsPerIteration.Add(an);
+                    var tempSum = a1;
+                    for (int i = 1; i < properties.Steps; i++)
+                    {
+                        if (tempSum >= Sn)
+                        {
+                            nucleonsPerIteration.Add(0);
+                        }
+                        else
+                        {
+                            an = a1 + (i - 1) * r;
+                            nucleonsPerIteration.Add(an);
+                            tempSum += an;
+                        }
                     }
                     return nucleonsPerIteration;
                 default:

@@ -90,7 +90,7 @@ namespace MultiscaleModelling
                     DisableMC();
                     StartSRXButton.IsEnabled = false;
                     EnableSRXCheckBox.IsEnabled = false;
-                    ResultLabel.Content = "SRX finished";
+                    SRXResultLabel.Content = "SRX finished";
                 }
                 DispatcherTimer timer = (DispatcherTimer)sender;
                 timer.Stop();
